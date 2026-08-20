@@ -9,6 +9,8 @@
 #include "Runtime/LiveLinkAnimationCore/Public/LiveLinkRemapAsset.h"
 #include "rebocap_pose_node.generated.h"
 
+class URebocapMapData;
+
 // 1. 骨骼定义
 USTRUCT()
 struct REBOCAP_RUNTIME_API FRebocapBodyMap {
@@ -105,7 +107,7 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalCon
 
   /** 填写骨骼映射/骨骼重定向对应名字映射表。 */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, NoClear, Category = Retarget, meta = (PinShownByDefault, ToolTip = "填写骨骼映射/骨骼重定向对应名字映射表。"))
-  TSubclassOf<ULiveLinkRemapAsset> retarget_asset_;
+  TSubclassOf<URebocapMapData> retarget_asset_;
 
   virtual void OnInitializeAnimInstance(const FAnimInstanceProxy* InProxy, const UAnimInstance* InAnimInstance) override;
   virtual void GatherDebugData(FNodeDebugData& DebugData) override;

@@ -1,4 +1,5 @@
 #include "rebocap_pose_node.h"
+#include "rebocap_body_remap_asset.h"
 
 #include "Roles/LiveLinkAnimationRole.h"
 #include "rebocap_skeleton_data.h"
@@ -15,6 +16,7 @@
 
 FRebocapPoseNode::FRebocapPoseNode()
     : LiveLinkSubjectName("rebocap")
+    , retarget_asset_(URebocapMapData::StaticClass())
 {
 }
 
@@ -352,7 +354,7 @@ void FRebocapPoseNode::PreUpdate(const UAnimInstance* InAnimInstance) {
   {
     UClass* retarget_asset_ptr = retarget_asset_.Get();
     if (!retarget_asset_ptr || retarget_asset_ptr->HasAnyClassFlags(CLASS_Abstract)) {
-      retarget_asset_ptr = ULiveLinkRemapAsset::StaticClass();
+      retarget_asset_ptr = URebocapMapData::StaticClass();
       retarget_asset_ = retarget_asset_ptr;
     }
     if (!current_retarget_asset_ || retarget_asset_ptr != current_retarget_asset_->GetClass()) {
