@@ -264,15 +264,29 @@ void FRebocapPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
   TSubclassOf<ULiveLinkRole> subject_role = live_link_client_->GetSubjectRole_AnyThread(live_link_subject_name);
   if (!subject_role) return;
   
+  bool bGotLiveLinkFrame = false;
   if (subject_role->IsChildOf(ULiveLinkAnimationRole::StaticClass())) {
-    if (!live_link_client_->EvaluateFrame_AnyThread(live_link_subject_name, ULiveLinkAnimationRole::StaticClass(), subject_frame_data)) {
+    bGotLiveLinkFrame = live_link_client_->EvaluateFrame_AnyThread(live_link_subject_name, ULiveLinkAnimationRole::StaticClass(), subject_frame_data);
+  }
+
+  if (bGotLiveLinkFrame) {
+    if (bHoldPoseOnDropout) {
+      cached_frame_data_ = subject_frame_data;
+      last_valid_frame_time_ = FPlatformTime::Seconds();
+      bHasValidFrameCached_ = true;
+    }
+  } else {
+    // 遇到网络瞬时卡顿/丢帧，只要在容错时间内，自动复用最后一帧有效动作，防止画面闪现 1 帧 T-Pose
+    if (bHoldPoseOnDropout && bHasValidFrameCached_ && (FPlatformTime::Seconds() - last_valid_frame_time_ <= DropoutTimeout)) {
+      subject_frame_data = cached_frame_data_;
+    } else {
       return;
     }
   }
+
   FLiveLinkSkeletonStaticData* skeleton_data = subject_frame_data.StaticData.Cast<FLiveLinkSkeletonStaticData>();
   FLiveLinkAnimationFrameData* frame_data = subject_frame_data.FrameData.Cast<FLiveLinkAnimationFrameData>();
-  check(skeleton_data);
-  check(frame_data);
+  if (!skeleton_data || !frame_data) return;
 
   FQuat pelvis_quat;
   FVector pelvis_position;
