@@ -1,0 +1,9 @@
+{
+	"BuildId": "37670630",
+	"Modules": 
+	{
+		"rebocap": "UnrealEditor-rebocap.dll",
+		"rebocap_editor": "UnrealEditor-rebocap_editor.dll",
+		"rebocap_runtime": "UnrealEditor-rebocap_runtime.dll"
+	}
+}

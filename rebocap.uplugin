@@ -1,0 +1,45 @@
+{
+	"FileVersion": 3,
+	"Version": 13,
+	"VersionName": "CL-1.3",
+	"FriendlyName": "Rebocap - pure blueprint control",
+	"Description": "rebocap LiveLink plugin with runtime and editor modules,Neck_Akatsuki as a branch for updates and adding extra features",
+	"Category": "Other",
+	"CreatedBy": "Neck_Akatsuki",
+	"CreatedByURL": "https://x.com/Todd_ike",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"EnabledByDefault": true,
+	"Modules": [
+		{
+			"Name": "rebocap_runtime",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "rebocap_editor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "rebocap",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "LiveLink",
+			"Enabled": true
+		},
+		{
+			"Name": "LiveLinkCamera",
+			"Enabled": true
+		}
+	]
+}
