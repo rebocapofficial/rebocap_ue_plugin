@@ -40,6 +40,18 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_SkeletalContr
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷预设与控制 (Presets & Control)", meta = (PinHiddenByDefault, DisplayName = "对称修改 (Symmetrical Edit)", ToolTip = "开启后，修改左侧肢体（锁骨/大臂/小臂/手/大腿/小腿/脚）的旋转角度时，自动镜像更新对应的右侧肢体。"))
     bool bMirrorEdit;
 
+    /** 对称修改 X轴 (Roll) 符号反转：勾选 = 负正对称 (-X)，未勾选 = 正正同向对称 (+X) */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷预设与控制 (Presets & Control)", meta = (EditCondition = "bMirrorEdit", PinHiddenByDefault, DisplayName = "X轴对称反转 (-X / +X)", ToolTip = "勾选后右侧 X (Roll) 符号反转 (-X，负正对称)；未勾选则右侧 X 与左侧保持相同符号 (+X，正正对称)。"))
+    bool bMirrorInvertRoll;
+
+    /** 对称修改 Y轴 (Pitch) 符号反转：勾选 = 负正对称 (-Y)，未勾选 = 正正同向对称 (+Y) */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷预设与控制 (Presets & Control)", meta = (EditCondition = "bMirrorEdit", PinHiddenByDefault, DisplayName = "Y轴对称反转 (-Y / +Y)", ToolTip = "勾选后右侧 Y (Pitch) 符号反转 (-Y)；未勾选则右侧 Y 与左侧保持相同符号 (+Y)。"))
+    bool bMirrorInvertPitch;
+
+    /** 对称修改 Z轴 (Yaw) 符号反转：勾选 = 负正对称 (-Z)，未勾选 = 正正同向对称 (+Z) */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷预设与控制 (Presets & Control)", meta = (EditCondition = "bMirrorEdit", PinHiddenByDefault, DisplayName = "Z轴对称反转 (-Z / +Z)", ToolTip = "勾选后右侧 Z (Yaw) 符号反转 (-Z)；未勾选则右侧 Z 与左侧保持相同符号 (+Z)。"))
+    bool bMirrorInvertYaw;
+
     /** 应用预设角度 */
     void ApplyPreset(ERebocapA2TPreset InPreset);
 

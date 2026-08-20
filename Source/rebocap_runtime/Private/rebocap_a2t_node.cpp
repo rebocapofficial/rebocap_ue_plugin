@@ -4,6 +4,9 @@
 FAnimNode_RebocapA2T::FAnimNode_RebocapA2T()
     : PresetTemplate(ERebocapA2TPreset::UE5_Manny_Quinn)
     , bMirrorEdit(true)
+    , bMirrorInvertRoll(true)
+    , bMirrorInvertPitch(false)
+    , bMirrorInvertYaw(true)
 
     // 1. 左上肢 (Left Arm)
     , LeftClavicle(TEXT("clavicle_l"))

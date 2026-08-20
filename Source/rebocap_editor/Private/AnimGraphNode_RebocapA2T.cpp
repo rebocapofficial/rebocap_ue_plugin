@@ -63,12 +63,16 @@ void UAnimGraphNode_RebocapA2T::PostEditChangeProperty(FPropertyChangedEvent& Pr
         return;
     }
 
-    // 2. 对称修改：只要开启 bMirrorEdit，修改左侧任意分量立即全自动镜像同步到右侧
+    // 2. 对称修改：只要开启 bMirrorEdit，根据用户勾选的 XYZ 正负轴向规则自动镜像同步到右侧
     if (Node.bMirrorEdit)
     {
-        auto MirrorRot = [](const FRotator& InRot) -> FRotator
+        const double MultRoll  = Node.bMirrorInvertRoll  ? -1.0 : 1.0;
+        const double MultPitch = Node.bMirrorInvertPitch ? -1.0 : 1.0;
+        const double MultYaw   = Node.bMirrorInvertYaw   ? -1.0 : 1.0;
+
+        auto MirrorRot = [&](const FRotator& InRot) -> FRotator
         {
-            return FRotator(InRot.Pitch, -InRot.Yaw, -InRot.Roll);
+            return FRotator(InRot.Pitch * MultPitch, InRot.Yaw * MultYaw, InRot.Roll * MultRoll);
         };
 
         Node.RightClavicleOffset = MirrorRot(Node.LeftClavicleOffset);
