@@ -4,33 +4,33 @@
 FAnimNode_RebocapA2T::FAnimNode_RebocapA2T()
     : PresetTemplate(ERebocapA2TPreset::UE5_Manny_Quinn)
     , bMirrorEdit(true)
-    , bMirrorInvertRoll(true)
+    , bMirrorInvertRoll(false)
     , bMirrorInvertPitch(false)
-    , bMirrorInvertYaw(true)
+    , bMirrorInvertYaw(false)
 
     // 1. 左上肢 (Left Arm)
     , LeftClavicle(TEXT("clavicle_l"))
-    , LeftClavicleOffset(FRotator::ZeroRotator)
+    , LeftClavicleOffset(15.0f, 0.0f, 0.0f)   // Pitch 15°
     , LeftUpperArm(TEXT("upperarm_l"))
-    , LeftUpperArmOffset(0.0f, 0.0f, 50.0f) // Roll/Z +50 抬手
+    , LeftUpperArmOffset(40.0f, 0.0f, 0.0f)   // Pitch 40° 抬手
     , LeftLowerArm(TEXT("lowerarm_l"))
-    , LeftLowerArmOffset(FRotator::ZeroRotator)
+    , LeftLowerArmOffset(0.0f, -40.0f, 0.0f)  // Yaw -40°
     , LeftHand(TEXT("hand_l"))
     , LeftHandOffset(FRotator::ZeroRotator)
 
     // 2. 右上肢 (Right Arm)
     , RightClavicle(TEXT("clavicle_r"))
-    , RightClavicleOffset(FRotator::ZeroRotator)
+    , RightClavicleOffset(15.0f, 0.0f, 0.0f)
     , RightUpperArm(TEXT("upperarm_r"))
-    , RightUpperArmOffset(0.0f, 0.0f, -50.0f) // Roll/Z -50 抬手
+    , RightUpperArmOffset(40.0f, 0.0f, 0.0f)
     , RightLowerArm(TEXT("lowerarm_r"))
-    , RightLowerArmOffset(FRotator::ZeroRotator)
+    , RightLowerArmOffset(0.0f, -40.0f, 0.0f)
     , RightHand(TEXT("hand_r"))
     , RightHandOffset(FRotator::ZeroRotator)
 
     // 3. 左下肢 (Left Leg)
     , LeftThigh(TEXT("thigh_l"))
-    , LeftThighOffset(0.0f, 0.0f, -5.0f) // 双腿微调收拢
+    , LeftThighOffset(-3.0f, 0.0f, -5.0f)     // Roll -5°, Pitch -3°
     , LeftCalf(TEXT("calf_l"))
     , LeftCalfOffset(FRotator::ZeroRotator)
     , LeftFoot(TEXT("foot_l"))
@@ -38,7 +38,7 @@ FAnimNode_RebocapA2T::FAnimNode_RebocapA2T()
 
     // 4. 右下肢 (Right Leg)
     , RightThigh(TEXT("thigh_r"))
-    , RightThighOffset(0.0f, 0.0f, 5.0f) // 双腿微调收拢
+    , RightThighOffset(-3.0f, 0.0f, -5.0f)
     , RightCalf(TEXT("calf_r"))
     , RightCalfOffset(FRotator::ZeroRotator)
     , RightFoot(TEXT("foot_r"))
@@ -54,83 +54,99 @@ void FAnimNode_RebocapA2T::ApplyPreset(ERebocapA2TPreset InPreset)
     switch (InPreset)
     {
     case ERebocapA2TPreset::UE5_Manny_Quinn:
-        LeftClavicleOffset = FRotator::ZeroRotator;
-        LeftUpperArmOffset = FRotator(0.0f, 0.0f, 50.0f);
-        LeftLowerArmOffset = FRotator::ZeroRotator;
-        LeftHandOffset = FRotator::ZeroRotator;
+        bMirrorInvertRoll = false;
+        bMirrorInvertPitch = false;
+        bMirrorInvertYaw = false;
 
-        RightClavicleOffset = FRotator::ZeroRotator;
-        RightUpperArmOffset = FRotator(0.0f, 0.0f, -50.0f);
-        RightLowerArmOffset = FRotator::ZeroRotator;
-        RightHandOffset = FRotator::ZeroRotator;
+        LeftClavicleOffset = FRotator(15.0f, 0.0f, 0.0f);
+        LeftUpperArmOffset = FRotator(40.0f, 0.0f, 0.0f);
+        LeftLowerArmOffset = FRotator(0.0f, -40.0f, 0.0f);
+        LeftHandOffset     = FRotator::ZeroRotator;
 
-        LeftThighOffset = FRotator(0.0f, 0.0f, -5.0f);
-        LeftCalfOffset = FRotator::ZeroRotator;
-        LeftFootOffset = FRotator::ZeroRotator;
+        RightClavicleOffset = FRotator(15.0f, 0.0f, 0.0f);
+        RightUpperArmOffset = FRotator(40.0f, 0.0f, 0.0f);
+        RightLowerArmOffset = FRotator(0.0f, -40.0f, 0.0f);
+        RightHandOffset     = FRotator::ZeroRotator;
 
-        RightThighOffset = FRotator(0.0f, 0.0f, 5.0f);
-        RightCalfOffset = FRotator::ZeroRotator;
-        RightFootOffset = FRotator::ZeroRotator;
+        LeftThighOffset = FRotator(-3.0f, 0.0f, -5.0f);
+        LeftCalfOffset  = FRotator::ZeroRotator;
+        LeftFootOffset  = FRotator::ZeroRotator;
+
+        RightThighOffset = FRotator(-3.0f, 0.0f, -5.0f);
+        RightCalfOffset  = FRotator::ZeroRotator;
+        RightFootOffset  = FRotator::ZeroRotator;
         break;
 
     case ERebocapA2TPreset::MMD_Standard:
+        bMirrorInvertRoll = false;
+        bMirrorInvertPitch = false;
+        bMirrorInvertYaw = false;
+
         LeftClavicleOffset = FRotator::ZeroRotator;
-        LeftUpperArmOffset = FRotator(0.0f, 0.0f, 40.0f);
+        LeftUpperArmOffset = FRotator(35.0f, 0.0f, 0.0f);
         LeftLowerArmOffset = FRotator::ZeroRotator;
-        LeftHandOffset = FRotator::ZeroRotator;
+        LeftHandOffset     = FRotator::ZeroRotator;
 
         RightClavicleOffset = FRotator::ZeroRotator;
-        RightUpperArmOffset = FRotator(0.0f, 0.0f, -40.0f);
+        RightUpperArmOffset = FRotator(35.0f, 0.0f, 0.0f);
         RightLowerArmOffset = FRotator::ZeroRotator;
-        RightHandOffset = FRotator::ZeroRotator;
+        RightHandOffset     = FRotator::ZeroRotator;
 
         LeftThighOffset = FRotator::ZeroRotator;
-        LeftCalfOffset = FRotator::ZeroRotator;
-        LeftFootOffset = FRotator::ZeroRotator;
+        LeftCalfOffset  = FRotator::ZeroRotator;
+        LeftFootOffset  = FRotator::ZeroRotator;
 
         RightThighOffset = FRotator::ZeroRotator;
-        RightCalfOffset = FRotator::ZeroRotator;
-        RightFootOffset = FRotator::ZeroRotator;
+        RightCalfOffset  = FRotator::ZeroRotator;
+        RightFootOffset  = FRotator::ZeroRotator;
         break;
 
     case ERebocapA2TPreset::VRoid_VRM:
+        bMirrorInvertRoll = false;
+        bMirrorInvertPitch = false;
+        bMirrorInvertYaw = false;
+
         LeftClavicleOffset = FRotator::ZeroRotator;
-        LeftUpperArmOffset = FRotator(0.0f, 0.0f, 40.0f);
+        LeftUpperArmOffset = FRotator(35.0f, 0.0f, 0.0f);
         LeftLowerArmOffset = FRotator::ZeroRotator;
-        LeftHandOffset = FRotator::ZeroRotator;
+        LeftHandOffset     = FRotator::ZeroRotator;
 
         RightClavicleOffset = FRotator::ZeroRotator;
-        RightUpperArmOffset = FRotator(0.0f, 0.0f, -40.0f);
+        RightUpperArmOffset = FRotator(35.0f, 0.0f, 0.0f);
         RightLowerArmOffset = FRotator::ZeroRotator;
-        RightHandOffset = FRotator::ZeroRotator;
+        RightHandOffset     = FRotator::ZeroRotator;
 
         LeftThighOffset = FRotator::ZeroRotator;
-        LeftCalfOffset = FRotator::ZeroRotator;
-        LeftFootOffset = FRotator::ZeroRotator;
+        LeftCalfOffset  = FRotator::ZeroRotator;
+        LeftFootOffset  = FRotator::ZeroRotator;
 
         RightThighOffset = FRotator::ZeroRotator;
-        RightCalfOffset = FRotator::ZeroRotator;
-        RightFootOffset = FRotator::ZeroRotator;
+        RightCalfOffset  = FRotator::ZeroRotator;
+        RightFootOffset  = FRotator::ZeroRotator;
         break;
 
     case ERebocapA2TPreset::Mixamo_APose:
+        bMirrorInvertRoll = false;
+        bMirrorInvertPitch = false;
+        bMirrorInvertYaw = false;
+
         LeftClavicleOffset = FRotator::ZeroRotator;
-        LeftUpperArmOffset = FRotator(0.0f, 0.0f, 45.0f);
+        LeftUpperArmOffset = FRotator(40.0f, 0.0f, 0.0f);
         LeftLowerArmOffset = FRotator::ZeroRotator;
-        LeftHandOffset = FRotator::ZeroRotator;
+        LeftHandOffset     = FRotator::ZeroRotator;
 
         RightClavicleOffset = FRotator::ZeroRotator;
-        RightUpperArmOffset = FRotator(0.0f, 0.0f, -45.0f);
+        RightUpperArmOffset = FRotator(40.0f, 0.0f, 0.0f);
         RightLowerArmOffset = FRotator::ZeroRotator;
-        RightHandOffset = FRotator::ZeroRotator;
+        RightHandOffset     = FRotator::ZeroRotator;
 
         LeftThighOffset = FRotator::ZeroRotator;
-        LeftCalfOffset = FRotator::ZeroRotator;
-        LeftFootOffset = FRotator::ZeroRotator;
+        LeftCalfOffset  = FRotator::ZeroRotator;
+        LeftFootOffset  = FRotator::ZeroRotator;
 
         RightThighOffset = FRotator::ZeroRotator;
-        RightCalfOffset = FRotator::ZeroRotator;
-        RightFootOffset = FRotator::ZeroRotator;
+        RightCalfOffset  = FRotator::ZeroRotator;
+        RightFootOffset  = FRotator::ZeroRotator;
         break;
 
     case ERebocapA2TPreset::Custom:
