@@ -10,7 +10,7 @@ FText UAnimGraphNode_RebocapPose::GetNodeTitle(ENodeTitleType::Type TitleType) c
 
 FText UAnimGraphNode_RebocapPose::GetTooltipText() const
 {
-    return LOCTEXT("RebocapPoseNodeTooltip", "连接Rebocap的实时动捕，并且通过骨骼映射驱动角色。（FK动画）");
+    return LOCTEXT("RebocapPoseNodeTooltip", "Drives skeletal mesh with real-time Rebocap LiveLink motion capture data via bone retarget mapping.");
 }
 
 FText UAnimGraphNode_RebocapPose::GetMenuCategory() const
@@ -20,7 +20,7 @@ FText UAnimGraphNode_RebocapPose::GetMenuCategory() const
 
 FText UAnimGraphNode_RebocapPose::GetKeywords() const
 {
-    return LOCTEXT("RebocapPoseKeywords", "rebocap, mocap, live link, 动捕, 姿态, 骨骼");
+    return LOCTEXT("RebocapPoseKeywords", "rebocap, mocap, live link, pose, skeleton, motion capture");
 }
 
 #undef LOCTEXT_NAMESPACE

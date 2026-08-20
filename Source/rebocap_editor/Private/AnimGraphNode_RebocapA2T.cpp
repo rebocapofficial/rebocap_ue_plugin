@@ -4,12 +4,12 @@
 
 FText UAnimGraphNode_RebocapA2T::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-    return LOCTEXT("RebocapA2TNodeTitle", "Rebocap A-Pose to T-Pose (A2T 姿态校准)");
+    return LOCTEXT("RebocapA2TNodeTitle", "Rebocap A-Pose to T-Pose");
 }
 
 FText UAnimGraphNode_RebocapA2T::GetTooltipText() const
 {
-    return LOCTEXT("RebocapA2TNodeTooltip", "Rebocap 专属四肢姿态校准节点：将 UE5/MetaHuman/二次元等 A-Pose 角色的四肢一键展开为标准 T-Pose，以便完美对接 Rebocap 动捕。");
+    return LOCTEXT("RebocapA2TNodeTooltip", "Calibrates A-Pose characters (e.g. UE5 Manny/Quinn, MetaHuman) into standard T-Pose for Rebocap motion capture.");
 }
 
 FText UAnimGraphNode_RebocapA2T::GetMenuCategory() const
@@ -19,7 +19,7 @@ FText UAnimGraphNode_RebocapA2T::GetMenuCategory() const
 
 FText UAnimGraphNode_RebocapA2T::GetKeywords() const
 {
-    return LOCTEXT("RebocapA2TKeywords", "rebocap, a2t, tpose, a-pose, t-pose, calibrate, 校准, 姿态, 展开");
+    return LOCTEXT("RebocapA2TKeywords", "rebocap, a2t, tpose, a-pose, t-pose, calibrate, limb, mocap, live link");
 }
 
 void UAnimGraphNode_RebocapA2T::CopyNodeDataToPreviewNode(FAnimNode_Base* InPreviewNode)
