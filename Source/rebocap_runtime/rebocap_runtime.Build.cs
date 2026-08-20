@@ -56,7 +56,17 @@ public class rebocap_runtime : ModuleRules
             "AnimGraphRuntime",
             "LiveLink",
             "LiveLinkMessageBusFramework",
-            "Messaging"
+            "Messaging",
+            "Json",
+            "JsonUtilities"
         });
+
+        if (Target.bBuildEditor)
+        {
+            PrivateDependencyModuleNames.AddRange(new string[]
+            {
+                "DesktopPlatform"
+            });
+        }
     }
 }

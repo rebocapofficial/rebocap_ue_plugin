@@ -47,6 +47,18 @@ class REBOCAP_RUNTIME_API URebocapMapData : public ULiveLinkRemapAsset {
   UFUNCTION(BlueprintCallable, CallInEditor, Category = "0. 快捷骨骼预设 (Preset Template)", meta = (DisplayName = "一键填充当前预设 (Apply Preset)", ToolTip = "点击后将当前所选预设的骨骼名称批量填充到下方输入框中。"))
   void ApplyPreset(ERebocapBonePreset InPreset);
 
+  /** 
+   * 导出当前骨骼配置与脚底碰撞体顶点为 JSON 文件（完全兼容 Blender 插件格式）。
+   */
+  UFUNCTION(BlueprintCallable, CallInEditor, Category = "0. 快捷骨骼预设 (Preset Template)", meta = (DisplayName = "📤 导出骨骼配置为 JSON (Export to JSON)", ToolTip = "将当前 24 根骨骼名称及脚底顶点索引导出为 .json 文件，完全兼容 Blender 插件格式。"))
+  void ExportToJson();
+
+  /** 
+   * 从 JSON 文件导入骨骼配置与脚底碰撞体顶点（完全兼容 Blender 插件格式）。
+   */
+  UFUNCTION(BlueprintCallable, CallInEditor, Category = "0. 快捷骨骼预设 (Preset Template)", meta = (DisplayName = "📥 从 JSON 文件导入 (Import from JSON)", ToolTip = "选择并导入 .json 配置文件，自动将骨骼名称与脚底顶点填入下方输入框。"))
+  void ImportFromJson();
+
 #if WITH_EDITOR
   virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
@@ -135,4 +147,9 @@ class REBOCAP_RUNTIME_API URebocapMapData : public ULiveLinkRemapAsset {
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Foot End / Toe (右脚趾/脚掌球)", ToolTip = "留空，暂无内容"))
   FName r_foot_;
+
+  // --- 6. 脚底贴地碰撞体顶点 (Foot Sole Indices) ---
+
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "6. 脚底贴地碰撞体顶点 (Foot Sole Indices)", meta = (DisplayName = "脚底网格顶点索引列表 (Foot Vertex Indices)", ToolTip = "包含 12 个脚底关键顶点索引（0~5 为左脚，6~11 为右脚），用于鞋底防穿模高精度贴地计算（完全兼容 Blender 插件导出格式）。"))
+  TArray<int32> FootIndices;
 };

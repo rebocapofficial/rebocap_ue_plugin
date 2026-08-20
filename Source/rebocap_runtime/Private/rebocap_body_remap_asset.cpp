@@ -1,9 +1,21 @@
 #include "rebocap_body_remap_asset.h"
 #include "rebocap_skeleton_data.h"
+#include "Misc/FileHelper.h"
+#include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
+#include "Dom/JsonObject.h"
+
+#if WITH_EDITOR
+#include "DesktopPlatformModule.h"
+#include "IDesktopPlatform.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Misc/MessageDialog.h"
+#endif
 
 URebocapMapData::URebocapMapData() {
   // 默认使用 Unreal Engine (UE4 / UE5 / MetaHuman) 官方标准骨骼预设
   PresetTemplate = ERebocapBonePreset::Unreal_Engine;
+  FootIndices.Init(-1, 12);
   ApplyPreset(ERebocapBonePreset::Unreal_Engine);
 }
 
@@ -199,6 +211,172 @@ void URebocapMapData::ApplyPreset(ERebocapBonePreset InPreset) {
   }
 
   InitializeTMap();
+}
+
+void URebocapMapData::ExportToJson() {
+#if WITH_EDITOR
+  IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+  if (!DesktopPlatform) {
+    UE_LOG(LogTemp, Error, TEXT("DesktopPlatform unavailable for ExportToJson"));
+    return;
+  }
+
+  const void* ParentWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
+  const FString DefaultPath = FPaths::ProjectSavedDir();
+  const FString DefaultFile = FString::Printf(TEXT("rebocap_bone_mapping_%s.json"), *GetName());
+  TArray<FString> OutFilenames;
+
+  const bool bSaved = DesktopPlatform->SaveFileDialog(
+      ParentWindowHandle,
+      TEXT("导出 Rebocap 骨骼映射为 JSON 文件 (完全兼容 Blender 格式)"),
+      DefaultPath,
+      DefaultFile,
+      TEXT("JSON 文件 (*.json)|*.json"),
+      EFileDialogFlags::None,
+      OutFilenames);
+
+  if (!bSaved || OutFilenames.Num() == 0) {
+    return;
+  }
+
+  const FString SaveFilePath = OutFilenames[0];
+
+  TSharedPtr<FJsonObject> RootObject = MakeShared<FJsonObject>();
+
+  // 1. 写入 24 根骨骼名称 (node_0 ~ node_23)
+  RootObject->SetStringField(TEXT("node_0"), rebocap_pelvis_.ToString());
+  RootObject->SetStringField(TEXT("node_1"), l_hip_.ToString());
+  RootObject->SetStringField(TEXT("node_2"), r_hip_.ToString());
+  RootObject->SetStringField(TEXT("node_3"), spine1_.ToString());
+  RootObject->SetStringField(TEXT("node_4"), l_knee_.ToString());
+  RootObject->SetStringField(TEXT("node_5"), r_knee_.ToString());
+  RootObject->SetStringField(TEXT("node_6"), spine2_.ToString());
+  RootObject->SetStringField(TEXT("node_7"), l_ankle_.ToString());
+  RootObject->SetStringField(TEXT("node_8"), r_ankle_.ToString());
+  RootObject->SetStringField(TEXT("node_9"), spine3_.ToString());
+  RootObject->SetStringField(TEXT("node_10"), l_foot_.ToString());
+  RootObject->SetStringField(TEXT("node_11"), r_foot_.ToString());
+  RootObject->SetStringField(TEXT("node_12"), neck_.ToString());
+  RootObject->SetStringField(TEXT("node_13"), l_collar_.ToString());
+  RootObject->SetStringField(TEXT("node_14"), r_collar_.ToString());
+  RootObject->SetStringField(TEXT("node_15"), head_.ToString());
+  RootObject->SetStringField(TEXT("node_16"), l_shoulder_.ToString());
+  RootObject->SetStringField(TEXT("node_17"), r_shoulder_.ToString());
+  RootObject->SetStringField(TEXT("node_18"), l_elbow_.ToString());
+  RootObject->SetStringField(TEXT("node_19"), r_elbow_.ToString());
+  RootObject->SetStringField(TEXT("node_20"), l_wrist_.ToString());
+  RootObject->SetStringField(TEXT("node_21"), r_wrist_.ToString());
+  RootObject->SetStringField(TEXT("node_22"), l_hand_.ToString());
+  RootObject->SetStringField(TEXT("node_23"), r_hand_.ToString());
+
+  // 2. 写入脚底碰撞体顶点索引 (foot_idx_0 ~ foot_idx_11)
+  for (int32 i = 0; i < 12; ++i) {
+    const int32 IdxVal = FootIndices.IsValidIndex(i) ? FootIndices[i] : -1;
+    RootObject->SetNumberField(FString::Printf(TEXT("foot_idx_%d"), i), IdxVal);
+  }
+
+  // 3. 序列化并保存
+  FString OutputString;
+  TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&OutputString);
+  if (FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer)) {
+    if (FFileHelper::SaveStringToFile(OutputString, *SaveFilePath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM)) {
+      UE_LOG(LogTemp, Display, TEXT("成功导出 Rebocap 骨骼映射到 JSON: %s"), *SaveFilePath);
+      FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(FString::Printf(TEXT("成功导出骨骼映射到文件：\n%s"), *SaveFilePath)));
+    }
+  }
+#endif
+}
+
+void URebocapMapData::ImportFromJson() {
+#if WITH_EDITOR
+  IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+  if (!DesktopPlatform) {
+    UE_LOG(LogTemp, Error, TEXT("DesktopPlatform unavailable for ImportFromJson"));
+    return;
+  }
+
+  const void* ParentWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
+  const FString DefaultPath = FPaths::ProjectSavedDir();
+  TArray<FString> OutFilenames;
+
+  const bool bOpened = DesktopPlatform->OpenFileDialog(
+      ParentWindowHandle,
+      TEXT("选择要导入的 Rebocap 骨骼映射 JSON 文件 (完全兼容 Blender 格式)"),
+      DefaultPath,
+      TEXT(""),
+      TEXT("JSON 文件 (*.json)|*.json"),
+      EFileDialogFlags::None,
+      OutFilenames);
+
+  if (!bOpened || OutFilenames.Num() == 0) {
+    return;
+  }
+
+  const FString OpenFilePath = OutFilenames[0];
+  FString JsonString;
+  if (!FFileHelper::LoadFileToString(JsonString, *OpenFilePath)) {
+    FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(FString::Printf(TEXT("读取文件失败：\n%s"), *OpenFilePath)));
+    return;
+  }
+
+  TSharedPtr<FJsonObject> RootObject;
+  TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+  if (!FJsonSerializer::Deserialize(Reader, RootObject) || !RootObject.IsValid()) {
+    FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("解析 JSON 失败，文件格式不合法！")));
+    return;
+  }
+
+  // 1. 读取 24 根骨骼名称 (node_0 ~ node_23)
+  auto ReadNode = [&](const TCHAR* Key, FName& OutName) {
+    if (RootObject->HasField(Key)) {
+      OutName = FName(*RootObject->GetStringField(Key));
+    }
+  };
+
+  ReadNode(TEXT("node_0"), rebocap_pelvis_);
+  ReadNode(TEXT("node_1"), l_hip_);
+  ReadNode(TEXT("node_2"), r_hip_);
+  ReadNode(TEXT("node_3"), spine1_);
+  ReadNode(TEXT("node_4"), l_knee_);
+  ReadNode(TEXT("node_5"), r_knee_);
+  ReadNode(TEXT("node_6"), spine2_);
+  ReadNode(TEXT("node_7"), l_ankle_);
+  ReadNode(TEXT("node_8"), r_ankle_);
+  ReadNode(TEXT("node_9"), spine3_);
+  ReadNode(TEXT("node_10"), l_foot_);
+  ReadNode(TEXT("node_11"), r_foot_);
+  ReadNode(TEXT("node_12"), neck_);
+  ReadNode(TEXT("node_13"), l_collar_);
+  ReadNode(TEXT("node_14"), r_collar_);
+  ReadNode(TEXT("node_15"), head_);
+  ReadNode(TEXT("node_16"), l_shoulder_);
+  ReadNode(TEXT("node_17"), r_shoulder_);
+  ReadNode(TEXT("node_18"), l_elbow_);
+  ReadNode(TEXT("node_19"), r_elbow_);
+  ReadNode(TEXT("node_20"), l_wrist_);
+  ReadNode(TEXT("node_21"), r_wrist_);
+  ReadNode(TEXT("node_22"), l_hand_);
+  ReadNode(TEXT("node_23"), r_hand_);
+
+  // 2. 读取脚底碰撞体顶点 (foot_idx_0 ~ foot_idx_11)
+  FootIndices.SetNumUninitialized(12);
+  for (int32 i = 0; i < 12; ++i) {
+    const FString Key = FString::Printf(TEXT("foot_idx_%d"), i);
+    if (RootObject->HasField(Key)) {
+      FootIndices[i] = RootObject->GetIntegerField(Key);
+    } else {
+      FootIndices[i] = -1;
+    }
+  }
+
+  // 3. 将预设模式自动设为自定义模式并更新映射表
+  PresetTemplate = ERebocapBonePreset::Custom;
+  InitializeTMap();
+  MarkPackageDirty();
+
+  UE_LOG(LogTemp, Display, TEXT("成功从 JSON 导入 Rebocap 骨骼映射: %s"), *OpenFilePath);
+  FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(FString::Printf(TEXT("成功导入骨骼映射配置！\n共读取 24 根骨骼及 12 个脚底顶点。"))));
+#endif
 }
 
 #if WITH_EDITOR
