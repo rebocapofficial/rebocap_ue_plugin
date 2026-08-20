@@ -7,9 +7,8 @@
 #include "ILiveLinkClient.h"
 #include "Runtime/AnimGraphRuntime/Public/BoneControllers/AnimNode_SkeletalControlBase.h"
 #include "Runtime/LiveLinkAnimationCore/Public/LiveLinkRemapAsset.h"
+#include "rebocap_body_remap_asset.h"
 #include "rebocap_pose_node.generated.h"
-
-class URebocapMapData;
 
 // 1. 骨骼定义
 USTRUCT()
