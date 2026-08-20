@@ -10,6 +10,14 @@
 #include "rebocap_body_remap_asset.h"
 #include "rebocap_pose_node.generated.h"
 
+/** 骨架提交姿态模式 */
+UENUM(BlueprintType)
+enum class ERebocapSkeletonPoseMode : uint8 {
+  AutoAtoT UMETA(DisplayName = "自动修正 (A-Pose 自动转 T-Pose 骨架) [推荐 UE5 / MetaHuman]"),
+  UseInputPose UMETA(DisplayName = "使用输入姿态 (需前置接入标准 T-Pose) [适用于已有 T-Pose 角色]"),
+  RawRefPose UMETA(DisplayName = "直接使用参考骨架原始姿态 (Raw Reference Pose)")
+};
+
 // 1. 骨骼定义
 USTRUCT()
 struct REBOCAP_RUNTIME_API FRebocapBodyMap {
@@ -98,6 +106,15 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalCon
   /** 控制是否连接Rebocap。（默认开启） */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName = "Connect Rebocap", ToolTip = "控制是否连接Rebocap。（默认开启）"))
   bool bAutoConnect = true;
+
+  // 3. 骨架提交姿态模式
+  /** 骨架提交姿态模式：
+   * · 自动修正：自动将 A-Pose (UE5 Manny / MetaHuman) 在数学上展开为标准 T-Pose 发送给 Rebocap（推荐）。
+   * · 使用输入姿态：读取前置节点连入的姿态（需前置提供 T-Pose 资产）。
+   * · 原始参考姿态：直接读取骨架 Mesh 的初始姿态。
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName = "Skeleton Pose Mode", ToolTip = "骨架提交姿态模式：\n· 自动修正：自动将 A-Pose (UE5 Manny / MetaHuman) 自动展开为标准水平 T-Pose 发送给 Rebocap（推荐）。\n· 使用输入姿态：读取前置节点连入的姿态（需前置提供 T-Pose 资产）。\n· 原始参考姿态：直接读取骨架 Mesh 的初始姿态。"))
+  ERebocapSkeletonPoseMode SkeletonPoseMode = ERebocapSkeletonPoseMode::AutoAtoT;
 
   // -----------------------------
 

@@ -17,6 +17,7 @@
 FRebocapPoseNode::FRebocapPoseNode()
     : LiveLinkSubjectName("rebocap")
     , retarget_asset_(URebocapMapData::StaticClass())
+    , SkeletonPoseMode(ERebocapSkeletonPoseMode::AutoAtoT)
 {
 }
 
@@ -232,6 +233,45 @@ void FRebocapPoseNode::Init_Foot_Vertices_And_SkeletalData(USkeletalMeshComponen
        AddBoneLocation(t_pose_.r_wrist, SkeletonPosition_, REBOCAP_R_Wrist_PARENTS_BONE);
        AddBoneLocation(t_pose_.l_hand, SkeletonPosition_, REBOCAP_L_Hand_PARENTS_BONE);
        AddBoneLocation(t_pose_.r_hand, SkeletonPosition_, REBOCAP_R_Hand_PARENTS_BONE);
+
+       // 方案 2: AutoAtoT 自动修正模式 (将下垂的 A-Pose 手臂在数学几何上水平展开为纯正 T-Pose)
+       if (SkeletonPoseMode == ERebocapSkeletonPoseMode::AutoAtoT && SkeletonPosition_.Num() >= 24) {
+         const FVector3f L_ShoulderPos = SkeletonPosition_[16];
+         const FVector3f R_ShoulderPos = SkeletonPosition_[17];
+         const FVector3f L_ElbowPos    = SkeletonPosition_[18];
+         const FVector3f R_ElbowPos    = SkeletonPosition_[19];
+         const FVector3f L_WristPos    = SkeletonPosition_[20];
+         const FVector3f R_WristPos    = SkeletonPosition_[21];
+         const FVector3f L_HandPos     = SkeletonPosition_[22];
+         const FVector3f R_HandPos     = SkeletonPosition_[23];
+
+         // 精确提取骨骼分段长度 (大臂、小臂、手掌)
+         const float L_UpperArmLen = (L_ElbowPos - L_ShoulderPos).Size();
+         const float L_LowerArmLen = (L_WristPos - L_ElbowPos).Size();
+         const float L_HandLen     = (L_HandPos - L_WristPos).Size();
+
+         const float R_UpperArmLen = (R_ElbowPos - R_ShoulderPos).Size();
+         const float R_LowerArmLen = (R_WristPos - R_ElbowPos).Size();
+         const float R_HandLen     = (R_HandPos - R_WristPos).Size();
+
+         // 水平展开基准方向向量 (由左肩指向右肩)
+         FVector3f ShoulderDir = (R_ShoulderPos - L_ShoulderPos);
+         ShoulderDir.Z = 0.0f; // 强制消除高度差，确保 100% 水平
+         if (!ShoulderDir.Normalize()) {
+           ShoulderDir = FVector3f(0.0f, 1.0f, 0.0f); // Fallback: UE 右侧 (+Y)
+         }
+
+         // 左手臂沿 -ShoulderDir 水平展开
+         SkeletonPosition_[18] = L_ShoulderPos - ShoulderDir * L_UpperArmLen;
+         SkeletonPosition_[20] = L_ShoulderPos - ShoulderDir * (L_UpperArmLen + L_LowerArmLen);
+         SkeletonPosition_[22] = L_ShoulderPos - ShoulderDir * (L_UpperArmLen + L_LowerArmLen + L_HandLen);
+
+         // 右手臂沿 +ShoulderDir 水平展开
+         SkeletonPosition_[19] = R_ShoulderPos + ShoulderDir * R_UpperArmLen;
+         SkeletonPosition_[21] = R_ShoulderPos + ShoulderDir * (R_UpperArmLen + R_LowerArmLen);
+         SkeletonPosition_[23] = R_ShoulderPos + ShoulderDir * (R_UpperArmLen + R_LowerArmLen + R_HandLen);
+       }
+
        MeterToCentimeter(SkeletonPosition_);
     }
 
