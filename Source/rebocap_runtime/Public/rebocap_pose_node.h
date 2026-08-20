@@ -139,10 +139,35 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalCon
   
   void UpdateConnectionState();
 
-  TPose t_pose_;
-  bool init_vertices_ = false;
+  struct FCachedPoseData {
+    FQuat pelvis_quat = FQuat::Identity;
+    FVector pelvis_position = FVector::ZeroVector;
+    FQuat l_hip = FQuat::Identity;
+    FQuat r_hip = FQuat::Identity;
+    FQuat spine1 = FQuat::Identity;
+    FQuat l_knee = FQuat::Identity;
+    FQuat r_knee = FQuat::Identity;
+    FQuat spine2 = FQuat::Identity;
+    FQuat l_ankle = FQuat::Identity;
+    FQuat r_ankle = FQuat::Identity;
+    FQuat spine3 = FQuat::Identity;
+    FQuat l_foot = FQuat::Identity;
+    FQuat r_foot = FQuat::Identity;
+    FQuat neck = FQuat::Identity;
+    FQuat l_collar = FQuat::Identity;
+    FQuat r_collar = FQuat::Identity;
+    FQuat head = FQuat::Identity;
+    FQuat l_shoulder = FQuat::Identity;
+    FQuat r_shoulder = FQuat::Identity;
+    FQuat l_elbow = FQuat::Identity;
+    FQuat r_elbow = FQuat::Identity;
+    FQuat l_wrist = FQuat::Identity;
+    FQuat r_wrist = FQuat::Identity;
+    FQuat l_hand = FQuat::Identity;
+    FQuat r_hand = FQuat::Identity;
+  };
 
-  FLiveLinkSubjectFrameData cached_frame_data_;
+  FCachedPoseData cached_pose_data_;
   double last_valid_frame_time_ = 0.0;
   bool bHasValidFrameCached_ = false;
 

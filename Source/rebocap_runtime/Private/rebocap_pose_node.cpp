@@ -269,51 +269,120 @@ void FRebocapPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
     bGotLiveLinkFrame = live_link_client_->EvaluateFrame_AnyThread(live_link_subject_name, ULiveLinkAnimationRole::StaticClass(), subject_frame_data);
   }
 
+  FQuat pelvis_quat = FQuat::Identity;
+  FVector pelvis_position = FVector::ZeroVector;
+  FQuat l_hip_quat = FQuat::Identity;
+  FQuat r_hip_quat = FQuat::Identity;
+  FQuat spine1_quat = FQuat::Identity;
+  FQuat l_knee_quat = FQuat::Identity;
+  FQuat r_knee_quat = FQuat::Identity;
+  FQuat spine2_quat = FQuat::Identity;
+  FQuat l_ankle_quat = FQuat::Identity;
+  FQuat r_ankle_quat = FQuat::Identity;
+  FQuat spine3_quat = FQuat::Identity;
+  FQuat l_foot_quat = FQuat::Identity;
+  FQuat r_foot_quat = FQuat::Identity;
+  FQuat neck_quat = FQuat::Identity;
+  FQuat l_collar_quat = FQuat::Identity;
+  FQuat r_collar_quat = FQuat::Identity;
+  FQuat head_quat = FQuat::Identity;
+  FQuat l_shoulder_quat = FQuat::Identity;
+  FQuat r_shoulder_quat = FQuat::Identity;
+  FQuat l_elbow_quat = FQuat::Identity;
+  FQuat r_elbow_quat = FQuat::Identity;
+  FQuat l_wrist_quat = FQuat::Identity;
+  FQuat r_wrist_quat = FQuat::Identity;
+  FQuat l_hand_quat = FQuat::Identity;
+  FQuat r_hand_quat = FQuat::Identity;
+
   if (bGotLiveLinkFrame) {
+    get_rotation3_location3(rebocap_bones::pelvis, subject_frame_data, pelvis_quat, pelvis_position);
+    l_hip_quat = get_rotation3(rebocap_bones::l_hip, subject_frame_data);
+    r_hip_quat = get_rotation3(rebocap_bones::r_hip, subject_frame_data);
+    spine1_quat = get_rotation3(rebocap_bones::spine1, subject_frame_data);
+    l_knee_quat = get_rotation3(rebocap_bones::l_knee, subject_frame_data);
+    r_knee_quat = get_rotation3(rebocap_bones::r_knee, subject_frame_data);
+    spine2_quat = get_rotation3(rebocap_bones::spine2, subject_frame_data);
+    l_ankle_quat = get_rotation3(rebocap_bones::l_ankle, subject_frame_data);
+    r_ankle_quat = get_rotation3(rebocap_bones::r_ankle, subject_frame_data);
+    spine3_quat = get_rotation3(rebocap_bones::spine3, subject_frame_data);
+    l_foot_quat = get_rotation3(rebocap_bones::l_foot, subject_frame_data);
+    r_foot_quat = get_rotation3(rebocap_bones::r_foot, subject_frame_data);
+    neck_quat = get_rotation3(rebocap_bones::neck, subject_frame_data);
+    l_collar_quat = get_rotation3(rebocap_bones::l_collar, subject_frame_data);
+    r_collar_quat = get_rotation3(rebocap_bones::r_collar, subject_frame_data);
+    head_quat = get_rotation3(rebocap_bones::head, subject_frame_data);
+    l_shoulder_quat = get_rotation3(rebocap_bones::l_shoulder, subject_frame_data);
+    r_shoulder_quat = get_rotation3(rebocap_bones::r_shoulder, subject_frame_data);
+    l_elbow_quat = get_rotation3(rebocap_bones::l_elbow, subject_frame_data);
+    r_elbow_quat = get_rotation3(rebocap_bones::r_elbow, subject_frame_data);
+    l_wrist_quat = get_rotation3(rebocap_bones::l_wrist, subject_frame_data);
+    r_wrist_quat = get_rotation3(rebocap_bones::r_wrist, subject_frame_data);
+    l_hand_quat = get_rotation3(rebocap_bones::l_hand, subject_frame_data);
+    r_hand_quat = get_rotation3(rebocap_bones::r_hand, subject_frame_data);
+
     if (bHoldPoseOnDropout) {
-      cached_frame_data_ = subject_frame_data;
+      cached_pose_data_.pelvis_quat = pelvis_quat;
+      cached_pose_data_.pelvis_position = pelvis_position;
+      cached_pose_data_.l_hip = l_hip_quat;
+      cached_pose_data_.r_hip = r_hip_quat;
+      cached_pose_data_.spine1 = spine1_quat;
+      cached_pose_data_.l_knee = l_knee_quat;
+      cached_pose_data_.r_knee = r_knee_quat;
+      cached_pose_data_.spine2 = spine2_quat;
+      cached_pose_data_.l_ankle = l_ankle_quat;
+      cached_pose_data_.r_ankle = r_ankle_quat;
+      cached_pose_data_.spine3 = spine3_quat;
+      cached_pose_data_.l_foot = l_foot_quat;
+      cached_pose_data_.r_foot = r_foot_quat;
+      cached_pose_data_.neck = neck_quat;
+      cached_pose_data_.l_collar = l_collar_quat;
+      cached_pose_data_.r_collar = r_collar_quat;
+      cached_pose_data_.head = head_quat;
+      cached_pose_data_.l_shoulder = l_shoulder_quat;
+      cached_pose_data_.r_shoulder = r_shoulder_quat;
+      cached_pose_data_.l_elbow = l_elbow_quat;
+      cached_pose_data_.r_elbow = r_elbow_quat;
+      cached_pose_data_.l_wrist = l_wrist_quat;
+      cached_pose_data_.r_wrist = r_wrist_quat;
+      cached_pose_data_.l_hand = l_hand_quat;
+      cached_pose_data_.r_hand = r_hand_quat;
+
       last_valid_frame_time_ = FPlatformTime::Seconds();
       bHasValidFrameCached_ = true;
     }
   } else {
-    // 遇到网络瞬时卡顿/丢帧，只要在容错时间内，自动复用最后一帧有效动作，防止画面闪现 1 帧 T-Pose
+    // 遇到丢帧使用缓存保护
     if (bHoldPoseOnDropout && bHasValidFrameCached_ && (FPlatformTime::Seconds() - last_valid_frame_time_ <= DropoutTimeout)) {
-      subject_frame_data = cached_frame_data_;
+      pelvis_quat = cached_pose_data_.pelvis_quat;
+      pelvis_position = cached_pose_data_.pelvis_position;
+      l_hip_quat = cached_pose_data_.l_hip;
+      r_hip_quat = cached_pose_data_.r_hip;
+      spine1_quat = cached_pose_data_.spine1;
+      l_knee_quat = cached_pose_data_.l_knee;
+      r_knee_quat = cached_pose_data_.r_knee;
+      spine2_quat = cached_pose_data_.spine2;
+      l_ankle_quat = cached_pose_data_.l_ankle;
+      r_ankle_quat = cached_pose_data_.r_ankle;
+      spine3_quat = cached_pose_data_.spine3;
+      l_foot_quat = cached_pose_data_.l_foot;
+      r_foot_quat = cached_pose_data_.r_foot;
+      neck_quat = cached_pose_data_.neck;
+      l_collar_quat = cached_pose_data_.l_collar;
+      r_collar_quat = cached_pose_data_.r_collar;
+      head_quat = cached_pose_data_.head;
+      l_shoulder_quat = cached_pose_data_.l_shoulder;
+      r_shoulder_quat = cached_pose_data_.r_shoulder;
+      l_elbow_quat = cached_pose_data_.l_elbow;
+      r_elbow_quat = cached_pose_data_.r_elbow;
+      l_wrist_quat = cached_pose_data_.l_wrist;
+      r_wrist_quat = cached_pose_data_.r_wrist;
+      l_hand_quat = cached_pose_data_.l_hand;
+      r_hand_quat = cached_pose_data_.r_hand;
     } else {
       return;
     }
   }
-
-  FLiveLinkSkeletonStaticData* skeleton_data = subject_frame_data.StaticData.Cast<FLiveLinkSkeletonStaticData>();
-  FLiveLinkAnimationFrameData* frame_data = subject_frame_data.FrameData.Cast<FLiveLinkAnimationFrameData>();
-  if (!skeleton_data || !frame_data) return;
-
-  FQuat pelvis_quat;
-  FVector pelvis_position;
-  get_rotation3_location3(rebocap_bones::pelvis, subject_frame_data, pelvis_quat, pelvis_position);
-  auto l_hip_quat = get_rotation3(rebocap_bones::l_hip, subject_frame_data);
-  auto r_hip_quat = get_rotation3(rebocap_bones::r_hip, subject_frame_data);
-  auto spine1_quat = get_rotation3(rebocap_bones::spine1, subject_frame_data);
-  auto l_knee_quat = get_rotation3(rebocap_bones::l_knee, subject_frame_data);
-  auto r_knee_quat = get_rotation3(rebocap_bones::r_knee, subject_frame_data);
-  auto spine2_quat = get_rotation3(rebocap_bones::spine2, subject_frame_data);
-  auto l_ankle_quat = get_rotation3(rebocap_bones::l_ankle, subject_frame_data);
-  auto r_ankle_quat = get_rotation3(rebocap_bones::r_ankle, subject_frame_data);
-  auto spine3_quat = get_rotation3(rebocap_bones::spine3, subject_frame_data);
-  auto l_foot_quat = get_rotation3(rebocap_bones::l_foot, subject_frame_data);
-  auto r_foot_quat = get_rotation3(rebocap_bones::r_foot, subject_frame_data);
-  auto neck_quat = get_rotation3(rebocap_bones::neck, subject_frame_data);
-  auto l_collar_quat = get_rotation3(rebocap_bones::l_collar, subject_frame_data);
-  auto r_collar_quat = get_rotation3(rebocap_bones::r_collar, subject_frame_data);
-  auto head_quat = get_rotation3(rebocap_bones::head, subject_frame_data);
-  auto l_shoulder_quat = get_rotation3(rebocap_bones::l_shoulder, subject_frame_data);
-  auto r_shoulder_quat = get_rotation3(rebocap_bones::r_shoulder, subject_frame_data);
-  auto l_elbow_quat = get_rotation3(rebocap_bones::l_elbow, subject_frame_data);
-  auto r_elbow_quat = get_rotation3(rebocap_bones::r_elbow, subject_frame_data);
-  auto l_wrist_quat = get_rotation3(rebocap_bones::l_wrist, subject_frame_data);
-  auto r_wrist_quat = get_rotation3(rebocap_bones::r_wrist, subject_frame_data);
-  auto l_hand_quat = get_rotation3(rebocap_bones::l_hand, subject_frame_data);
-  auto r_hand_quat = get_rotation3(rebocap_bones::r_hand, subject_frame_data);
 
   const FBoneContainer& bone_container = mesh_bases.GetPose().GetBoneContainer();
   FCompactPoseBoneIndex compact_pose_bone_to_modify = bone_map_.Pelvis.GetCompactPoseIndex(bone_container);
