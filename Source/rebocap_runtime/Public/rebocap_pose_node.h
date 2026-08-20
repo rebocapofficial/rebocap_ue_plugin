@@ -139,6 +139,9 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalCon
   
   void UpdateConnectionState();
 
+  TPose t_pose_;
+  bool init_vertices_ = false;
+
   struct FCachedPoseData {
     FQuat pelvis_quat = FQuat::Identity;
     FVector pelvis_position = FVector::ZeroVector;
