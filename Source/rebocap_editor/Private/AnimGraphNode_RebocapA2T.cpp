@@ -22,4 +22,29 @@ FText UAnimGraphNode_RebocapA2T::GetKeywords() const
     return LOCTEXT("RebocapA2TKeywords", "rebocap, a2t, tpose, a-pose, t-pose, calibrate, 校准, 姿态, 展开");
 }
 
+void UAnimGraphNode_RebocapA2T::CopyNodeDataToPreviewNode(FAnimNode_Base* InPreviewNode)
+{
+    FAnimNode_RebocapA2T* PreviewNode = static_cast<FAnimNode_RebocapA2T*>(InPreviewNode);
+
+    PreviewNode->LeftClavicleOffset = Node.LeftClavicleOffset;
+    PreviewNode->LeftUpperArmOffset = Node.LeftUpperArmOffset;
+    PreviewNode->LeftLowerArmOffset = Node.LeftLowerArmOffset;
+    PreviewNode->LeftHandOffset = Node.LeftHandOffset;
+
+    PreviewNode->RightClavicleOffset = Node.RightClavicleOffset;
+    PreviewNode->RightUpperArmOffset = Node.RightUpperArmOffset;
+    PreviewNode->RightLowerArmOffset = Node.RightLowerArmOffset;
+    PreviewNode->RightHandOffset = Node.RightHandOffset;
+
+    PreviewNode->LeftThighOffset = Node.LeftThighOffset;
+    PreviewNode->LeftCalfOffset = Node.LeftCalfOffset;
+    PreviewNode->LeftFootOffset = Node.LeftFootOffset;
+
+    PreviewNode->RightThighOffset = Node.RightThighOffset;
+    PreviewNode->RightCalfOffset = Node.RightCalfOffset;
+    PreviewNode->RightFootOffset = Node.RightFootOffset;
+
+    PreviewNode->Alpha = Node.Alpha;
+}
+
 #undef LOCTEXT_NAMESPACE
