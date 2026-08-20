@@ -104,6 +104,68 @@ void URebocapMapData::ApplyPreset(ERebocapBonePreset InPreset) {
       r_foot_ = TEXT("RightToeBase");
       break;
 
+    case ERebocapBonePreset::Mixamo_Prefix:
+      rebocap_pelvis_ = TEXT("mixamorig:Hips");
+      spine1_ = TEXT("mixamorig:Spine");
+      spine2_ = TEXT("mixamorig:Spine1");
+      spine3_ = TEXT("mixamorig:Spine2");
+      neck_ = TEXT("mixamorig:Neck");
+      head_ = TEXT("mixamorig:Head");
+
+      l_collar_ = TEXT("mixamorig:LeftShoulder");
+      l_shoulder_ = TEXT("mixamorig:LeftArm");
+      l_elbow_ = TEXT("mixamorig:LeftForeArm");
+      l_wrist_ = TEXT("mixamorig:LeftHand");
+      l_hand_ = TEXT("mixamorig:LeftHandIndex1");
+
+      r_collar_ = TEXT("mixamorig:RightShoulder");
+      r_shoulder_ = TEXT("mixamorig:RightArm");
+      r_elbow_ = TEXT("mixamorig:RightForeArm");
+      r_wrist_ = TEXT("mixamorig:RightHand");
+      r_hand_ = TEXT("mixamorig:RightHandIndex1");
+
+      l_hip_ = TEXT("mixamorig:LeftUpLeg");
+      l_knee_ = TEXT("mixamorig:LeftLeg");
+      l_ankle_ = TEXT("mixamorig:LeftFoot");
+      l_foot_ = TEXT("mixamorig:LeftToeBase");
+
+      r_hip_ = TEXT("mixamorig:RightUpLeg");
+      r_knee_ = TEXT("mixamorig:RightLeg");
+      r_ankle_ = TEXT("mixamorig:RightFoot");
+      r_foot_ = TEXT("mixamorig:RightToeBase");
+      break;
+
+    case ERebocapBonePreset::MMD_Japanese:
+      rebocap_pelvis_ = TEXT("センター");
+      spine1_ = TEXT("下半身");
+      spine2_ = TEXT("上半身");
+      spine3_ = TEXT("上半身2");
+      neck_ = TEXT("首");
+      head_ = TEXT("頭");
+
+      l_collar_ = TEXT("左肩");
+      l_shoulder_ = TEXT("左腕");
+      l_elbow_ = TEXT("左ひじ");
+      l_wrist_ = TEXT("左手首");
+      l_hand_ = TEXT("左人指１");
+
+      r_collar_ = TEXT("右肩");
+      r_shoulder_ = TEXT("右腕");
+      r_elbow_ = TEXT("右ひじ");
+      r_wrist_ = TEXT("右手首");
+      r_hand_ = TEXT("右人指１");
+
+      l_hip_ = TEXT("左足");
+      l_knee_ = TEXT("左ひざ");
+      l_ankle_ = TEXT("左足首");
+      l_foot_ = TEXT("左つま先");
+
+      r_hip_ = TEXT("右足");
+      r_knee_ = TEXT("右ひざ");
+      r_ankle_ = TEXT("右足首");
+      r_foot_ = TEXT("右つま先");
+      break;
+
     case ERebocapBonePreset::VRM_Humanoid:
       rebocap_pelvis_ = TEXT("Hips");
       spine1_ = TEXT("Spine");

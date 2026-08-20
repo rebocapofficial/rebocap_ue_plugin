@@ -9,7 +9,9 @@ UENUM(BlueprintType)
 enum class ERebocapBonePreset : uint8 {
   UE5_Mannequin UMETA(DisplayName = "UE5 Manny / Quinn (官方标准骨骼)"),
   UE4_Mannequin UMETA(DisplayName = "UE4 SK_Mannequin (经典小白人骨骼)"),
-  Mixamo UMETA(DisplayName = "Adobe Mixamo 骨骼规范"),
+  Mixamo UMETA(DisplayName = "Adobe Mixamo (无前缀: Hips, Spine...)"),
+  Mixamo_Prefix UMETA(DisplayName = "Adobe Mixamo (带前缀: mixamorig:Hips...)"),
+  MMD_Japanese UMETA(DisplayName = "MMD 经典日文骨骼 (センター, 上半身, 左腕...)"),
   VRM_Humanoid UMETA(DisplayName = "VRM / VRoid / Unity Humanoid 骨骼规范"),
   Rebocap_Standard UMETA(DisplayName = "Rebocap 24骨标准命名 (默认值)"),
   Custom UMETA(DisplayName = "Custom (自定义模式)")
