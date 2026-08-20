@@ -1,9 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Animation/AnimNodeBase.h"
 #include "BoneContainer.h"
 #include "BonePose.h"
-#include "BoneControllers/AnimNode_SkeletalControlBase.h"
 #include "rebocap_a2t_node.generated.h"
 
 /** A-Pose 转 T-Pose 预设模板 */
@@ -18,15 +18,19 @@ enum class ERebocapA2TPreset : uint8
 };
 
 /**
- * Rebocap 专属四肢与关节 A-Pose 转 T-Pose 姿态校准节点 (Runtime)
- * 支持对肩膀、大臂、小臂、手腕、大腿、小腿、脚部进行全方位的局部旋转累加、对称修改与预设切换。
+ * Rebocap 专属四肢与关节 A-Pose 转 T-Pose 姿态校准节点 (Local Space 局部骨骼空间)
+ * 在局部骨骼空间中对四肢关节施加旋转叠加，引擎自动通过骨骼树层级向下递归传递，彻底杜绝关节焊死与脱臼撕裂。
  */
 USTRUCT(BlueprintInternalUseOnly)
-struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_SkeletalControlBase
+struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
 {
     GENERATED_USTRUCT_BODY()
 
     FAnimNode_RebocapA2T();
+
+    /** 输入姿态 (Local Space 局部姿态) */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Links)
+    FPoseLink BasePose;
 
     // ==========================================
     // --- 0. 快捷预设与对称控制 ---
@@ -71,7 +75,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_SkeletalContr
     UPROPERTY(EditAnywhere, Category = "1. 左上肢 (Left Arm)", meta = (DisplayName = "左大臂 (Left UpperArm)"))
     FBoneReference LeftUpperArm;
 
-    /** 左大臂旋转偏移（默认 Roll/Z: +50° 抬手展开至 T-Pose） */
+    /** 左大臂旋转偏移（默认 Pitch 40° 抬手） */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "1. 左上肢 (Left Arm)", meta = (PinHiddenByDefault, DisplayName = "左大臂旋转偏移"))
     FRotator LeftUpperArmOffset;
 
@@ -107,7 +111,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_SkeletalContr
     UPROPERTY(EditAnywhere, Category = "2. 右上肢 (Right Arm)", meta = (DisplayName = "右大臂 (Right UpperArm)"))
     FBoneReference RightUpperArm;
 
-    /** 右大臂旋转偏移（默认 Roll/Z: -50° 抬手展开至 T-Pose） */
+    /** 右大臂旋转偏移（默认 Pitch 40° 抬手） */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. 右上肢 (Right Arm)", meta = (PinHiddenByDefault, DisplayName = "右大臂旋转偏移"))
     FRotator RightUpperArmOffset;
 
@@ -135,7 +139,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_SkeletalContr
     UPROPERTY(EditAnywhere, Category = "3. 左下肢 (Left Leg)", meta = (DisplayName = "左大腿 (Left Thigh)"))
     FBoneReference LeftThigh;
 
-    /** 左大腿旋转偏移（默认 Roll: -5° 修正收拢） */
+    /** 左大腿旋转偏移 */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "3. 左下肢 (Left Leg)", meta = (PinHiddenByDefault, DisplayName = "左大腿旋转偏移"))
     FRotator LeftThighOffset;
 
@@ -163,7 +167,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_SkeletalContr
     UPROPERTY(EditAnywhere, Category = "4. 右下肢 (Right Leg)", meta = (DisplayName = "右大腿 (Right Thigh)"))
     FBoneReference RightThigh;
 
-    /** 右大腿旋转偏移（默认 Roll: +5° 修正收拢） */
+    /** 右大腿旋转偏移 */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. 右下肢 (Right Leg)", meta = (PinHiddenByDefault, DisplayName = "右大腿旋转偏移"))
     FRotator RightThighOffset;
 
@@ -183,8 +187,14 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_SkeletalContr
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. 右下肢 (Right Leg)", meta = (PinHiddenByDefault, DisplayName = "右脚踝旋转偏移"))
     FRotator RightFootOffset;
 
+    /** 校准生效强度 (0.0 = 不改变原始姿态, 1.0 = 100% 展开为 T-Pose) */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (PinShownByDefault, ClampMin = "0.0", ClampMax = "1.0", DisplayName = "Alpha (校准强度权重)"))
+    float Alpha;
+
     // --- 虚函数重写 ---
-    virtual void EvaluateSkeletalControl_AnyThread(FComponentSpacePoseContext& Output, TArray<FBoneTransform>& OutBoneTransforms) override;
-    virtual bool IsValidToEvaluate(const USkeleton* Skeleton, const FBoneContainer& RequiredBones) override;
-    virtual void InitializeBoneReferences(const FBoneContainer& RequiredBones) override;
+    virtual void Initialize_AnyThread(const FAnimationInitializeContext& Context) override;
+    virtual void CacheBones_AnyThread(const FAnimationCacheBonesContext& Context) override;
+    virtual void Update_AnyThread(const FAnimationUpdateContext& Context) override;
+    virtual void Evaluate_AnyThread(FPoseContext& Output) override;
+    virtual void GatherDebugData(FNodeDebugData& DebugData) override;
 };

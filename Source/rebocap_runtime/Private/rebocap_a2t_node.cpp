@@ -43,8 +43,8 @@ FAnimNode_RebocapA2T::FAnimNode_RebocapA2T()
     , RightCalfOffset(FRotator::ZeroRotator)
     , RightFoot(TEXT("foot_r"))
     , RightFootOffset(FRotator::ZeroRotator)
+    , Alpha(1.0f)
 {
-    Alpha = 1.0f;
 }
 
 void FAnimNode_RebocapA2T::ApplyPreset(ERebocapA2TPreset InPreset)
@@ -155,8 +155,20 @@ void FAnimNode_RebocapA2T::ApplyPreset(ERebocapA2TPreset InPreset)
     }
 }
 
-void FAnimNode_RebocapA2T::InitializeBoneReferences(const FBoneContainer& RequiredBones)
+void FAnimNode_RebocapA2T::Initialize_AnyThread(const FAnimationInitializeContext& Context)
 {
+    DECLARE_SCOPE_HIERARCHICAL_COUNTER_ANIMNODE(Initialize_AnyThread);
+    FAnimNode_Base::Initialize_AnyThread(Context);
+    BasePose.Initialize(Context);
+}
+
+void FAnimNode_RebocapA2T::CacheBones_AnyThread(const FAnimationCacheBonesContext& Context)
+{
+    DECLARE_SCOPE_HIERARCHICAL_COUNTER_ANIMNODE(CacheBones_AnyThread);
+    BasePose.CacheBones(Context);
+
+    const FBoneContainer& RequiredBones = Context.AnimInstanceProxy->GetRequiredBones();
+
     LeftClavicle.Initialize(RequiredBones);
     LeftUpperArm.Initialize(RequiredBones);
     LeftLowerArm.Initialize(RequiredBones);
@@ -176,27 +188,26 @@ void FAnimNode_RebocapA2T::InitializeBoneReferences(const FBoneContainer& Requir
     RightFoot.Initialize(RequiredBones);
 }
 
-bool FAnimNode_RebocapA2T::IsValidToEvaluate(const USkeleton* Skeleton, const FBoneContainer& RequiredBones)
+void FAnimNode_RebocapA2T::Update_AnyThread(const FAnimationUpdateContext& Context)
 {
-    return Alpha > 0.0f && (
-        LeftUpperArm.IsValidToEvaluate(RequiredBones) ||
-        RightUpperArm.IsValidToEvaluate(RequiredBones) ||
-        LeftThigh.IsValidToEvaluate(RequiredBones) ||
-        RightThigh.IsValidToEvaluate(RequiredBones)
-    );
+    DECLARE_SCOPE_HIERARCHICAL_COUNTER_ANIMNODE(Update_AnyThread);
+    BasePose.Update(Context);
+    GetEvaluateGraphExposedInputs().Execute(Context);
 }
 
-void FAnimNode_RebocapA2T::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseContext& Output, TArray<FBoneTransform>& OutBoneTransforms)
+void FAnimNode_RebocapA2T::Evaluate_AnyThread(FPoseContext& Output)
 {
-    OutBoneTransforms.Reset();
+    DECLARE_SCOPE_HIERARCHICAL_COUNTER_ANIMNODE(Evaluate_AnyThread);
+    BasePose.Evaluate(Output);
+
     if (FMath::IsNearlyZero(Alpha))
     {
         return;
     }
 
-    const FBoneContainer& BoneContainer = Output.Pose.GetPose().GetBoneContainer();
+    const FBoneContainer& BoneContainer = Output.Pose.GetBoneContainer();
 
-    auto ApplyAdditiveBoneRotation = [&](FBoneReference& BoneRef, const FRotator& OffsetRotator)
+    auto ApplyLocalRotation = [&](FBoneReference& BoneRef, const FRotator& OffsetRotator)
     {
         if (BoneRef.BoneIndex == INDEX_NONE || OffsetRotator.IsNearlyZero())
         {
@@ -206,45 +217,42 @@ void FAnimNode_RebocapA2T::EvaluateSkeletalControl_AnyThread(FComponentSpacePose
         const FCompactPoseBoneIndex CompactIndex = BoneRef.GetCompactPoseIndex(BoneContainer);
         if (CompactIndex != INDEX_NONE)
         {
-            FTransform CSTransform = Output.Pose.GetComponentSpaceTransform(CompactIndex);
+            FTransform LocalTransform = Output.Pose[CompactIndex];
             
-            // 计算局部骨骼空间的附加四元数
-            const FQuat LocalAdditiveQuat = FQuat(OffsetRotator);
-            
-            // 在局部骨骼坐标系中应用旋转
-            const FQuat NewCSRotation = CSTransform.GetRotation() * LocalAdditiveQuat;
-            CSTransform.SetRotation(NewCSRotation);
+            // 局部四元数累加
+            const FQuat LocalAdditiveQuat = FQuat(OffsetRotator * Alpha);
+            LocalTransform.SetRotation(LocalTransform.GetRotation() * LocalAdditiveQuat);
 
-            // 写入 OutBoneTransforms
-            OutBoneTransforms.Add(FBoneTransform(CompactIndex, CSTransform));
+            Output.Pose[CompactIndex] = LocalTransform;
         }
     };
 
     // 1. 左上肢 (Left Arm)
-    ApplyAdditiveBoneRotation(LeftClavicle, LeftClavicleOffset);
-    ApplyAdditiveBoneRotation(LeftUpperArm, LeftUpperArmOffset);
-    ApplyAdditiveBoneRotation(LeftLowerArm, LeftLowerArmOffset);
-    ApplyAdditiveBoneRotation(LeftHand, LeftHandOffset);
+    ApplyLocalRotation(LeftClavicle, LeftClavicleOffset);
+    ApplyLocalRotation(LeftUpperArm, LeftUpperArmOffset);
+    ApplyLocalRotation(LeftLowerArm, LeftLowerArmOffset);
+    ApplyLocalRotation(LeftHand, LeftHandOffset);
 
     // 2. 右上肢 (Right Arm)
-    ApplyAdditiveBoneRotation(RightClavicle, RightClavicleOffset);
-    ApplyAdditiveBoneRotation(RightUpperArm, RightUpperArmOffset);
-    ApplyAdditiveBoneRotation(RightLowerArm, RightLowerArmOffset);
-    ApplyAdditiveBoneRotation(RightHand, RightHandOffset);
+    ApplyLocalRotation(RightClavicle, RightClavicleOffset);
+    ApplyLocalRotation(RightUpperArm, RightUpperArmOffset);
+    ApplyLocalRotation(RightLowerArm, RightLowerArmOffset);
+    ApplyLocalRotation(RightHand, RightHandOffset);
 
     // 3. 左下肢 (Left Leg)
-    ApplyAdditiveBoneRotation(LeftThigh, LeftThighOffset);
-    ApplyAdditiveBoneRotation(LeftCalf, LeftCalfOffset);
-    ApplyAdditiveBoneRotation(LeftFoot, LeftFootOffset);
+    ApplyLocalRotation(LeftThigh, LeftThighOffset);
+    ApplyLocalRotation(LeftCalf, LeftCalfOffset);
+    ApplyLocalRotation(LeftFoot, LeftFootOffset);
 
     // 4. 右下肢 (Right Leg)
-    ApplyAdditiveBoneRotation(RightThigh, RightThighOffset);
-    ApplyAdditiveBoneRotation(RightCalf, RightCalfOffset);
-    ApplyAdditiveBoneRotation(RightFoot, RightFootOffset);
+    ApplyLocalRotation(RightThigh, RightThighOffset);
+    ApplyLocalRotation(RightCalf, RightCalfOffset);
+    ApplyLocalRotation(RightFoot, RightFootOffset);
+}
 
-    // 必须按骨骼层级索引升序排列，否则 UE 引擎 LocalBlendCSBoneTransforms 会触发断言断点崩溃
-    if (OutBoneTransforms.Num() > 0)
-    {
-        OutBoneTransforms.Sort(FCompareBoneTransformIndex());
-    }
+void FAnimNode_RebocapA2T::GatherDebugData(FNodeDebugData& DebugData)
+{
+    const FString DebugLine = DebugData.GetNodeName(this);
+    DebugData.AddDebugItem(DebugLine);
+    BasePose.GatherDebugData(DebugData);
 }
