@@ -33,11 +33,11 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_SkeletalContr
     // ==========================================
 
     /** 快捷预设选择：切换预设将自动填充下方所有四肢旋转角度 */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷预设与控制 (Presets & Control)", meta = (DisplayName = "选择 A-Pose 预设 (Select Preset)", ToolTip = "选择预设将自动覆盖下方所有四肢旋转角度。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷预设与控制 (Presets & Control)", meta = (PinHiddenByDefault, DisplayName = "选择 A-Pose 预设 (Select Preset)", ToolTip = "选择预设将自动覆盖下方所有四肢旋转角度。"))
     ERebocapA2TPreset PresetTemplate;
 
     /** 对称修改 (默认开启)：修改左侧四肢数值时，自动镜像同步到右侧四肢 */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷预设与控制 (Presets & Control)", meta = (DisplayName = "对称修改 (Symmetrical Edit)", ToolTip = "开启后，修改左侧肢体（锁骨/大臂/小臂/手/大腿/小腿/脚）的旋转角度时，自动镜像更新对应的右侧肢体。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷预设与控制 (Presets & Control)", meta = (PinHiddenByDefault, DisplayName = "对称修改 (Symmetrical Edit)", ToolTip = "开启后，修改左侧肢体（锁骨/大臂/小臂/手/大腿/小腿/脚）的旋转角度时，自动镜像更新对应的右侧肢体。"))
     bool bMirrorEdit;
 
     /** 应用预设角度 */
