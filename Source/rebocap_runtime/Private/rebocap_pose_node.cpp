@@ -288,6 +288,34 @@ void FRebocapPoseNode::Init_Foot_Vertices_And_SkeletalData(USkeletalMeshComponen
   }
 }
 
+void FRebocapPoseNode::UpdateAtoTOffsets() {
+  if (SkeletonPoseMode == ERebocapSkeletonPoseMode::AutoAtoT && t_pose_.l_shoulder && t_pose_.l_elbow && t_pose_.r_shoulder && t_pose_.r_elbow) {
+    const FVector L_ShoulderPos = t_pose_.l_shoulder.value().GetTranslation();
+    const FVector L_ElbowPos    = t_pose_.l_elbow.value().GetTranslation();
+    const FVector R_ShoulderPos = t_pose_.r_shoulder.value().GetTranslation();
+    const FVector R_ElbowPos    = t_pose_.r_elbow.value().GetTranslation();
+
+    const FVector L_Arm_A_Dir = (L_ElbowPos - L_ShoulderPos).GetSafeNormal();
+    const FVector R_Arm_A_Dir = (R_ElbowPos - R_ShoulderPos).GetSafeNormal();
+
+    FVector ShoulderDir = (R_ShoulderPos - L_ShoulderPos);
+    ShoulderDir.Z = 0.0f;
+    if (!ShoulderDir.Normalize()) {
+      ShoulderDir = FVector(0.0f, 1.0f, 0.0f);
+    }
+
+    const FVector L_Arm_T_Dir = -ShoulderDir;
+    const FVector R_Arm_T_Dir = ShoulderDir;
+
+    // 计算将 A 姿态大臂方向旋转至 T 姿态水平方向的四元数偏移
+    L_AtoT_Offset_ = FQuat::FindBetweenVectors(L_Arm_A_Dir, L_Arm_T_Dir);
+    R_AtoT_Offset_ = FQuat::FindBetweenVectors(R_Arm_A_Dir, R_Arm_T_Dir);
+  } else {
+    L_AtoT_Offset_ = FQuat::Identity;
+    R_AtoT_Offset_ = FQuat::Identity;
+  }
+}
+
 void FRebocapPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseContext& Output, TArray<FBoneTransform>& OutBoneTransforms) {
   USkeletalMeshComponent* skel_comp = Output.AnimInstanceProxy->GetSkelMeshComponent();
   FCSPose<FCompactPose>& mesh_bases = Output.Pose;
@@ -295,6 +323,7 @@ void FRebocapPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
   if (!live_link_client_) return;
   
   Init_Tpose_Bone(bone_map_, mesh_bases, t_pose_);
+  UpdateAtoTOffsets();
   Init_Foot_Vertices_And_SkeletalData(skel_comp);
   
   FLiveLinkSubjectFrameData subject_frame_data;
@@ -366,15 +395,21 @@ void FRebocapPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
   TRANSFORM(L_Collar, l_collar);
   TRANSFORM(R_Collar, r_collar);
   TRANSFORM(Head, head);
-  TRANSFORM(L_Shoulder, l_shoulder);
-  TRANSFORM(R_Shoulder, r_shoulder);
-  TRANSFORM(L_Elbow, l_elbow);
-  TRANSFORM(R_Elbow, r_elbow);
-  TRANSFORM(L_Wrist, l_wrist);
-  TRANSFORM(R_Wrist, r_wrist);
-  TRANSFORM(L_Hand, l_hand);
-  TRANSFORM(R_Hand, r_hand);
 #undef TRANSFORM
+
+  // 手臂链条：在 AutoAtoT 模式下自动应用 A转T 旋转基底补偿
+  const FQuat L_Arm_Base_Offset = (SkeletonPoseMode == ERebocapSkeletonPoseMode::AutoAtoT) ? L_AtoT_Offset_ : FQuat::Identity;
+  const FQuat R_Arm_Base_Offset = (SkeletonPoseMode == ERebocapSkeletonPoseMode::AutoAtoT) ? R_AtoT_Offset_ : FQuat::Identity;
+
+  apply_rebocap_transform(bone_map_.L_Shoulder, l_shoulder_quat * (L_Arm_Base_Offset * t_pose_.l_shoulder.value_or(FTransform()).GetRotation()), mesh_bases);
+  apply_rebocap_transform(bone_map_.L_Elbow, l_elbow_quat * (L_Arm_Base_Offset * t_pose_.l_elbow.value_or(FTransform()).GetRotation()), mesh_bases);
+  apply_rebocap_transform(bone_map_.L_Wrist, l_wrist_quat * (L_Arm_Base_Offset * t_pose_.l_wrist.value_or(FTransform()).GetRotation()), mesh_bases);
+  apply_rebocap_transform(bone_map_.L_Hand, l_hand_quat * (L_Arm_Base_Offset * t_pose_.l_hand.value_or(FTransform()).GetRotation()), mesh_bases);
+
+  apply_rebocap_transform(bone_map_.R_Shoulder, r_shoulder_quat * (R_Arm_Base_Offset * t_pose_.r_shoulder.value_or(FTransform()).GetRotation()), mesh_bases);
+  apply_rebocap_transform(bone_map_.R_Elbow, r_elbow_quat * (R_Arm_Base_Offset * t_pose_.r_elbow.value_or(FTransform()).GetRotation()), mesh_bases);
+  apply_rebocap_transform(bone_map_.R_Wrist, r_wrist_quat * (R_Arm_Base_Offset * t_pose_.r_wrist.value_or(FTransform()).GetRotation()), mesh_bases);
+  apply_rebocap_transform(bone_map_.R_Hand, r_hand_quat * (R_Arm_Base_Offset * t_pose_.r_hand.value_or(FTransform()).GetRotation()), mesh_bases);
 }
 
 void FRebocapPoseNode::PreUpdate(const UAnimInstance* InAnimInstance) {

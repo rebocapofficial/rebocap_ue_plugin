@@ -145,11 +145,14 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalCon
   ILiveLinkClient* live_link_client_ = nullptr;
   virtual void InitializeBoneReferences(const FBoneContainer& RequiredBones) override;
   
-  // 状态管理函数 (移除了参数)
   void UpdateConnectionState();
 
   TPose t_pose_;
   bool init_vertices_ = false;
   
+  FQuat L_AtoT_Offset_ = FQuat::Identity;
+  FQuat R_AtoT_Offset_ = FQuat::Identity;
+  void UpdateAtoTOffsets();
+
   TArray<FVector3f> LeftVertices_, LeftNormals_, RightVertices_, RightNormals_, SkeletonPosition_;
 };
