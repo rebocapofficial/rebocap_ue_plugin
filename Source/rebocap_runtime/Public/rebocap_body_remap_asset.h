@@ -4,11 +4,23 @@
 #include "LiveLinkRemapAsset.h"
 #include "rebocap_body_remap_asset.generated.h"
 
+/** 常用骨骼命名预设规范 */
+UENUM(BlueprintType)
+enum class ERebocapBonePreset : uint8 {
+  UE5_Mannequin UMETA(DisplayName = "UE5 Manny / Quinn (官方标准骨骼)"),
+  UE4_Mannequin UMETA(DisplayName = "UE4 SK_Mannequin (经典小白人骨骼)"),
+  Mixamo UMETA(DisplayName = "Adobe Mixamo 骨骼规范"),
+  VRM_Humanoid UMETA(DisplayName = "VRM / VRoid / Unity Humanoid 骨骼规范"),
+  Rebocap_Standard UMETA(DisplayName = "Rebocap 24骨标准命名 (默认值)"),
+  Custom UMETA(DisplayName = "Custom (自定义模式)")
+};
+
 /** 
  * Rebocap 骨骼映射基础资产
  * 用于将标准 Rebocap 24 骨节点映射到当前角色的对应骨骼名称。
+ * 支持顶部下拉切换预设一键自动填词，并允许随时手动微调。
  */
-UCLASS(BlueprintType, Blueprintable, meta = (ToolTip = "Rebocap 骨骼映射基础资产，用于将标准 Rebocap 24 骨节点映射到当前角色的对应骨骼名称。"))
+UCLASS(BlueprintType, Blueprintable, meta = (ToolTip = "Rebocap 骨骼映射资产，用于将标准 Rebocap 24 骨节点映射到当前角色的对应骨骼名称。\n支持在面板顶部选择预设一键自动填词。"))
 class REBOCAP_RUNTIME_API URebocapMapData : public ULiveLinkRemapAsset {
   GENERATED_BODY()
 
@@ -21,6 +33,22 @@ class REBOCAP_RUNTIME_API URebocapMapData : public ULiveLinkRemapAsset {
 
   UFUNCTION(BlueprintCallable, Category = "BoneRemapping")
   void InitializeTMap();
+
+  /** 
+   * 快捷预设选择：切换预设将自动将下方所有输入框覆盖为对应的骨骼名称。
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷骨骼预设 (Preset Template)", meta = (DisplayName = "选择骨骼预设 (Select Preset)", ToolTip = "选择预设将自动将下方所有输入框覆盖为对应的骨骼名称。填充后可继续手动微调。"))
+  ERebocapBonePreset PresetTemplate = ERebocapBonePreset::UE5_Mannequin;
+
+  /** 
+   * 点击立即将当前所选预设的骨骼名称批量填充到下方输入框中。
+   */
+  UFUNCTION(BlueprintCallable, CallInEditor, Category = "0. 快捷骨骼预设 (Preset Template)", meta = (DisplayName = "一键填充当前预设 (Apply Preset)", ToolTip = "点击后将当前所选预设的骨骼名称批量填充到下方输入框中。"))
+  void ApplyPreset(ERebocapBonePreset InPreset);
+
+#if WITH_EDITOR
+  virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "0. 映射表预览 (Mapping Preview)")
   TMap<FName, FName> name_mapping_;
@@ -106,48 +134,4 @@ class REBOCAP_RUNTIME_API URebocapMapData : public ULiveLinkRemapAsset {
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Foot / Ball / Toe (右脚趾/脚掌球)", ToolTip = "右脚脚尖/前掌骨骼。\n· 对应 UE5: ball_r\n· 对应 Mixamo: RightToeBase\n· 对应 VRM: RightToes"))
   FName r_foot_;
-};
-
-// ============================================================================
-// 预设类定义 (Presets)
-// ============================================================================
-
-/** 
- * Rebocap 骨骼映射资产 - UE5 Manny / Quinn (官方标准骨骼) 预设
- */
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Rebocap Map: UE5 Manny/Quinn Preset", ToolTip = "Rebocap 骨骼映射资产 - 针对 UE5 官方标准骨架 (Manny / Quinn) 的开箱即用预设。"))
-class REBOCAP_RUNTIME_API URebocapMapData_UE5Mannequin : public URebocapMapData {
-  GENERATED_BODY()
- public:
-  URebocapMapData_UE5Mannequin();
-};
-
-/** 
- * Rebocap 骨骼映射资产 - UE4 SK_Mannequin (经典小白人骨骼) 预设
- */
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Rebocap Map: UE4 Mannequin Preset", ToolTip = "Rebocap 骨骼映射资产 - 针对 UE4 经典官方骨架 (SK_Mannequin) 的开箱即用预设。"))
-class REBOCAP_RUNTIME_API URebocapMapData_UE4Mannequin : public URebocapMapData {
-  GENERATED_BODY()
- public:
-  URebocapMapData_UE4Mannequin();
-};
-
-/** 
- * Rebocap 骨骼映射资产 - Mixamo 骨骼规范预设
- */
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Rebocap Map: Mixamo Preset", ToolTip = "Rebocap 骨骼映射资产 - 针对 Adobe Mixamo 标准骨骼命名的开箱即用预设。"))
-class REBOCAP_RUNTIME_API URebocapMapData_Mixamo : public URebocapMapData {
-  GENERATED_BODY()
- public:
-  URebocapMapData_Mixamo();
-};
-
-/** 
- * Rebocap 骨骼映射资产 - VRM / VRoid / Unity Humanoid 骨骼规范预设
- */
-UCLASS(BlueprintType, Blueprintable, meta = (DisplayName = "Rebocap Map: VRM / Humanoid Preset", ToolTip = "Rebocap 骨骼映射资产 - 针对 VRoid / VRM / Unity Humanoid 标准骨骼命名的开箱即用预设。"))
-class REBOCAP_RUNTIME_API URebocapMapData_VRM_Humanoid : public URebocapMapData {
-  GENERATED_BODY()
- public:
-  URebocapMapData_VRM_Humanoid();
 };
