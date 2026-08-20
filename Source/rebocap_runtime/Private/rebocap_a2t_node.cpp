@@ -209,13 +209,14 @@ void FAnimNode_RebocapA2T::EvaluateSkeletalControl_AnyThread(FComponentSpacePose
             FTransform CSTransform = Output.Pose.GetComponentSpaceTransform(CompactIndex);
             
             // 计算局部骨骼空间的附加四元数
-            const FQuat LocalAdditiveQuat = FQuat(OffsetRotator * Alpha);
+            const FQuat LocalAdditiveQuat = FQuat(OffsetRotator);
             
-            // 在局部骨骼坐标系中应用旋转 (CSTransform.Rotation * LocalAdditiveQuat)
+            // 在局部骨骼坐标系中应用旋转
             const FQuat NewCSRotation = CSTransform.GetRotation() * LocalAdditiveQuat;
             CSTransform.SetRotation(NewCSRotation);
 
-            Output.Pose.SetComponentSpaceTransform(CompactIndex, CSTransform);
+            // 写入 OutBoneTransforms，由 UE 引擎原生骨骼解算器自动向下递归更新所有子骨骼与副骨骼空间坐标
+            OutBoneTransforms.Add(FBoneTransform(CompactIndex, CSTransform));
         }
     };
 
