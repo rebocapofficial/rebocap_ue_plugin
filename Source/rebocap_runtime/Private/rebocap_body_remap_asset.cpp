@@ -59,9 +59,145 @@ void URebocapMapData::InitializeTMap() {
 
 FName URebocapMapData::GetRemappedBoneName_Implementation(FName CurveName) const {
   if (auto it = name_mapping_.Find(CurveName)) {
-    UE_LOG(LogTemp, Display, TEXT("GetRemappedBoneName_Implementation %s %s"), *CurveName.ToString(), *it->ToString());
+    UE_LOG(LogTemp, Display, TEXT("GetRemappedBoneName_Implementation %s -> %s"), *CurveName.ToString(), *it->ToString());
     return *it;
   }
   UE_LOG(LogTemp, Warning, TEXT("GetRemappedBoneName_Implementation %s failed!"), *CurveName.ToString());
-  return NAME_None; // ✅ 修正：返回 NAME_None 而不是 ""
+  return NAME_None;
+}
+
+// ----------------------------------------------------------------------------
+// 预设 1: UE5 Manny / Quinn (官方标准骨骼) 预设
+// ----------------------------------------------------------------------------
+URebocapMapData_UE5Mannequin::URebocapMapData_UE5Mannequin() {
+  rebocap_pelvis_ = TEXT("pelvis");
+  spine1_ = TEXT("spine_01");
+  spine2_ = TEXT("spine_02");
+  spine3_ = TEXT("spine_03");
+  neck_ = TEXT("neck_01");
+  head_ = TEXT("head");
+
+  l_collar_ = TEXT("clavicle_l");
+  l_shoulder_ = TEXT("upperarm_l");
+  l_elbow_ = TEXT("lowerarm_l");
+  l_wrist_ = TEXT("hand_l");
+  l_hand_ = TEXT("index_01_l");
+
+  r_collar_ = TEXT("clavicle_r");
+  r_shoulder_ = TEXT("upperarm_r");
+  r_elbow_ = TEXT("lowerarm_r");
+  r_wrist_ = TEXT("hand_r");
+  r_hand_ = TEXT("index_01_r");
+
+  l_hip_ = TEXT("thigh_l");
+  l_knee_ = TEXT("calf_l");
+  l_ankle_ = TEXT("foot_l");
+  l_foot_ = TEXT("ball_l");
+
+  r_hip_ = TEXT("thigh_r");
+  r_knee_ = TEXT("calf_r");
+  r_ankle_ = TEXT("foot_r");
+  r_foot_ = TEXT("ball_r");
+}
+
+// ----------------------------------------------------------------------------
+// 预设 2: UE4 SK_Mannequin (经典小白人骨骼) 预设
+// ----------------------------------------------------------------------------
+URebocapMapData_UE4Mannequin::URebocapMapData_UE4Mannequin() {
+  rebocap_pelvis_ = TEXT("pelvis");
+  spine1_ = TEXT("spine_01");
+  spine2_ = TEXT("spine_02");
+  spine3_ = TEXT("spine_03");
+  neck_ = TEXT("neck_01");
+  head_ = TEXT("head");
+
+  l_collar_ = TEXT("clavicle_l");
+  l_shoulder_ = TEXT("upperarm_l");
+  l_elbow_ = TEXT("lowerarm_l");
+  l_wrist_ = TEXT("hand_l");
+  l_hand_ = TEXT("index_01_l");
+
+  r_collar_ = TEXT("clavicle_r");
+  r_shoulder_ = TEXT("upperarm_r");
+  r_elbow_ = TEXT("lowerarm_r");
+  r_wrist_ = TEXT("hand_r");
+  r_hand_ = TEXT("index_01_r");
+
+  l_hip_ = TEXT("thigh_l");
+  l_knee_ = TEXT("calf_l");
+  l_ankle_ = TEXT("foot_l");
+  l_foot_ = TEXT("ball_l");
+
+  r_hip_ = TEXT("thigh_r");
+  r_knee_ = TEXT("calf_r");
+  r_ankle_ = TEXT("foot_r");
+  r_foot_ = TEXT("ball_r");
+}
+
+// ----------------------------------------------------------------------------
+// 预设 3: Mixamo 骨骼规范预设
+// ----------------------------------------------------------------------------
+URebocapMapData_Mixamo::URebocapMapData_Mixamo() {
+  rebocap_pelvis_ = TEXT("Hips");
+  spine1_ = TEXT("Spine");
+  spine2_ = TEXT("Spine1");
+  spine3_ = TEXT("Spine2");
+  neck_ = TEXT("Neck");
+  head_ = TEXT("Head");
+
+  l_collar_ = TEXT("LeftShoulder");
+  l_shoulder_ = TEXT("LeftArm");
+  l_elbow_ = TEXT("LeftForeArm");
+  l_wrist_ = TEXT("LeftHand");
+  l_hand_ = TEXT("LeftHandIndex1");
+
+  r_collar_ = TEXT("RightShoulder");
+  r_shoulder_ = TEXT("RightArm");
+  r_elbow_ = TEXT("RightForeArm");
+  r_wrist_ = TEXT("RightHand");
+  r_hand_ = TEXT("RightHandIndex1");
+
+  l_hip_ = TEXT("LeftUpLeg");
+  l_knee_ = TEXT("LeftLeg");
+  l_ankle_ = TEXT("LeftFoot");
+  l_foot_ = TEXT("LeftToeBase");
+
+  r_hip_ = TEXT("RightUpLeg");
+  r_knee_ = TEXT("RightLeg");
+  r_ankle_ = TEXT("RightFoot");
+  r_foot_ = TEXT("RightToeBase");
+}
+
+// ----------------------------------------------------------------------------
+// 预设 4: VRM / VRoid / Unity Humanoid 骨骼规范预设
+// ----------------------------------------------------------------------------
+URebocapMapData_VRM_Humanoid::URebocapMapData_VRM_Humanoid() {
+  rebocap_pelvis_ = TEXT("Hips");
+  spine1_ = TEXT("Spine");
+  spine2_ = TEXT("Chest");
+  spine3_ = TEXT("UpperChest");
+  neck_ = TEXT("Neck");
+  head_ = TEXT("Head");
+
+  l_collar_ = TEXT("LeftShoulder");
+  l_shoulder_ = TEXT("LeftUpperArm");
+  l_elbow_ = TEXT("LeftLowerArm");
+  l_wrist_ = TEXT("LeftHand");
+  l_hand_ = TEXT("LeftIndexProximal");
+
+  r_collar_ = TEXT("RightShoulder");
+  r_shoulder_ = TEXT("RightUpperArm");
+  r_elbow_ = TEXT("RightLowerArm");
+  r_wrist_ = TEXT("RightHand");
+  r_hand_ = TEXT("RightIndexProximal");
+
+  l_hip_ = TEXT("LeftUpperLeg");
+  l_knee_ = TEXT("LeftLowerLeg");
+  l_ankle_ = TEXT("LeftFoot");
+  l_foot_ = TEXT("LeftToes");
+
+  r_hip_ = TEXT("RightUpperLeg");
+  r_knee_ = TEXT("RightLowerLeg");
+  r_ankle_ = TEXT("RightFoot");
+  r_foot_ = TEXT("RightToes");
 }
