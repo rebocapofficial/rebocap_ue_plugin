@@ -7,8 +7,7 @@
 /** 常用骨骼命名预设规范 */
 UENUM(BlueprintType)
 enum class ERebocapBonePreset : uint8 {
-  UE5_Mannequin UMETA(DisplayName = "UE5 Manny / Quinn (官方标准骨骼)"),
-  UE4_Mannequin UMETA(DisplayName = "UE4 SK_Mannequin (经典小白人骨骼)"),
+  Unreal_Engine UMETA(DisplayName = "Unreal Engine (UE4 / UE5 / MetaHuman 官方标准骨骼)"),
   Mixamo UMETA(DisplayName = "Adobe Mixamo (无前缀: Hips, Spine...)"),
   Mixamo_Prefix UMETA(DisplayName = "Adobe Mixamo (带前缀: mixamorig:Hips...)"),
   MMD_Japanese UMETA(DisplayName = "MMD 经典日文骨骼 (センター, 上半身, 左腕...)"),
@@ -40,7 +39,7 @@ class REBOCAP_RUNTIME_API URebocapMapData : public ULiveLinkRemapAsset {
    * 快捷预设选择：切换预设将自动将下方所有输入框覆盖为对应的骨骼名称。
    */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷骨骼预设 (Preset Template)", meta = (DisplayName = "选择骨骼预设 (Select Preset)", ToolTip = "选择预设将自动将下方所有输入框覆盖为对应的骨骼名称。填充后可继续手动微调。"))
-  ERebocapBonePreset PresetTemplate = ERebocapBonePreset::UE5_Mannequin;
+  ERebocapBonePreset PresetTemplate = ERebocapBonePreset::Unreal_Engine;
 
   /** 
    * 点击立即将当前所选预设的骨骼名称批量填充到下方输入框中。
@@ -57,83 +56,83 @@ class REBOCAP_RUNTIME_API URebocapMapData : public ULiveLinkRemapAsset {
 
   // --- 1. 躯干与头部 (Root & Spine & Head) ---
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Pelvis / Hips (盆骨/根骨骼)", ToolTip = "标准动捕根骨骼。\n· 对应 UE5: pelvis\n· 对应 Mixamo: Hips\n· 对应 VRM: Hips"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Pelvis / Hips (盆骨/根骨骼)", ToolTip = "动捕根骨骼。\n· 同时接收rebocap移动的坐标。"))
   FName rebocap_pelvis_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Spine1 / Spine_01 (脊椎1/下脊椎)", ToolTip = "下部脊椎骨骼。\n· 对应 UE5: spine_01\n· 对应 Mixamo: Spine\n· 对应 VRM: Spine"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Spine1 / Spine (腰椎)", ToolTip = "通常对应肚脐这个关节。"))
   FName spine1_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Spine2 / Spine_02 (脊椎2/中脊椎)", ToolTip = "中部脊椎骨骼。\n· 对应 UE5: spine_02\n· 对应 Mixamo: Spine1\n· 对应 VRM: Spine"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Spine2 / Chest (胸腔)", ToolTip = "对应胃部的关节（胸腔三角凹槽处）\n· 控制整个胸腔的摆动"))
   FName spine2_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Spine3 / Spine_03 (脊椎3/胸腔)", ToolTip = "上部脊椎/胸腔骨骼。\n· 对应 UE5: spine_03\n· 对应 Mixamo: Spine2 / Chest\n· 对应 VRM: Chest"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Spine3 / Up Chest (上胸)", ToolTip = "对应胸部/乳房的关节\n· 对于没有该关节的角色，该选项留空。"))
   FName spine3_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Neck / Neck_01 (脖子/颈部)", ToolTip = "颈部骨骼。\n· 对应 UE5: neck_01\n· 对应 Mixamo: Neck\n· 对应 VRM: Neck"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Neck / Neck_01 (脖子/颈部)", ToolTip = "脖子"))
   FName neck_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Head (头部)", ToolTip = "头部骨骼。\n· 对应 UE5: head\n· 对应 Mixamo: Head\n· 对应 VRM: Head"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Head (头部)", ToolTip = "头部"))
   FName head_;
 
   // --- 2. 左上肢 (Left Arm) ---
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Collar / Clavicle (左锁骨)", ToolTip = "左侧锁骨骨骼。\n· 对应 UE5: clavicle_l\n· 对应 Mixamo: LeftShoulder\n· 对应 VRM: LeftShoulder"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Collar / Shoulder (左锁骨/肩膀)", ToolTip = "对应背书包的肩膀骨骼"))
   FName l_collar_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Shoulder / UpperArm (左大臂/上臂)", ToolTip = "左侧大臂骨骼。\n· 对应 UE5: upperarm_l\n· 对应 Mixamo: LeftArm\n· 对应 VRM: LeftUpperArm"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Shoulder / UpperArm (左大臂/上臂)", ToolTip = "对应戴上臂追踪器的骨骼"))
   FName l_shoulder_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Elbow / LowerArm (左小臂/前臂)", ToolTip = "左侧小臂骨骼。\n· 对应 UE5: lowerarm_l\n· 对应 Mixamo: LeftForeArm\n· 对应 VRM: LeftLowerArm"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Elbow / LowerArm (左小臂/前臂)", ToolTip = "对应戴下臂追踪器的骨骼"))
   FName l_elbow_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Wrist / Hand (左手腕/手掌)", ToolTip = "左手手腕/手掌主骨骼。\n· 对应 UE5: hand_l\n· 对应 Mixamo: LeftHand\n· 对应 VRM: LeftHand"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Wrist / Hand (左手腕/手掌)", ToolTip = "对应戴手追踪器的骨骼"))
   FName l_wrist_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Hand / Fingers (左手指/末端)", ToolTip = "左手末端/手指基础骨骼。\n· 对应 UE5: index_01_l\n· 对应 Mixamo: LeftHandIndex1"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Hand End / Fingers (左手指/末端)", ToolTip = "留空，暂无内容"))
   FName l_hand_;
 
   // --- 3. 右上肢 (Right Arm) ---
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Collar / Clavicle (右锁骨)", ToolTip = "右侧锁骨骨骼。\n· 对应 UE5: clavicle_r\n· 对应 Mixamo: RightShoulder\n· 对应 VRM: RightShoulder"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Collar / Shoulder (右锁骨/肩膀)", ToolTip = "对应背书包的肩膀骨骼"))
   FName r_collar_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Shoulder / UpperArm (右大臂/上臂)", ToolTip = "右侧大臂骨骼。\n· 对应 UE5: upperarm_r\n· 对应 Mixamo: RightArm\n· 对应 VRM: RightUpperArm"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Shoulder / UpperArm (右大臂/上臂)", ToolTip = "对应戴上臂追踪器的骨骼"))
   FName r_shoulder_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Elbow / LowerArm (右小臂/前臂)", ToolTip = "右侧小臂骨骼。\n· 对应 UE5: lowerarm_r\n· 对应 Mixamo: RightForeArm\n· 对应 VRM: RightLowerArm"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Elbow / LowerArm (右小臂/前臂)", ToolTip = "对应戴下臂追踪器的骨骼"))
   FName r_elbow_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Wrist / Hand (右手腕/手掌)", ToolTip = "右手手腕/手掌主骨骼。\n· 对应 UE5: hand_r\n· 对应 Mixamo: RightHand\n· 对应 VRM: RightHand"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Wrist / Hand (右手腕/手掌)", ToolTip = "对应戴手追踪器的骨骼"))
   FName r_wrist_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Hand / Fingers (右手指/末端)", ToolTip = "右手末端/手指基础骨骼。\n· 对应 UE5: index_01_r\n· 对应 Mixamo: RightHandIndex1"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Hand End / Fingers (右手指/末端)", ToolTip = "留空，暂无内容"))
   FName r_hand_;
 
   // --- 4. 左下肢 (Left Leg) ---
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Hip / Thigh / UpperLeg (左大腿)", ToolTip = "左侧大腿骨骼。\n· 对应 UE5: thigh_l\n· 对应 Mixamo: LeftUpLeg\n· 对应 VRM: LeftUpperLeg"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Hip / Thigh / UpperLeg (左大腿)", ToolTip = "对应戴大腿追踪器的骨骼"))
   FName l_hip_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Knee / Calf / LowerLeg (左小腿)", ToolTip = "左侧小腿骨骼。\n· 对应 UE5: calf_l\n· 对应 Mixamo: LeftLeg\n· 对应 VRM: LeftLowerLeg"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Knee / Calf / LowerLeg (左小腿)", ToolTip = "对应戴小腿追踪器的骨骼"))
   FName l_knee_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Ankle / Foot (左脚踝/脚部)", ToolTip = "左侧脚踝骨骼。\n· 对应 UE5: foot_l\n· 对应 Mixamo: LeftFoot\n· 对应 VRM: LeftFoot"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Ankle / Foot (左脚踝/脚部)", ToolTip = "对应戴脚追踪器的骨骼"))
   FName l_ankle_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Foot / Ball / Toe (左脚趾/脚掌球)", ToolTip = "左脚脚尖/前掌骨骼。\n· 对应 UE5: ball_l\n· 对应 Mixamo: LeftToeBase\n· 对应 VRM: LeftToes"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Foot End / Toe (左脚趾/脚掌球)", ToolTip = "留空，暂无内容"))
   FName l_foot_;
 
   // --- 5. 右下肢 (Right Leg) ---
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Hip / Thigh / UpperLeg (右大腿)", ToolTip = "右侧大腿骨骼。\n· 对应 UE5: thigh_r\n· 对应 Mixamo: RightUpLeg\n· 对应 VRM: RightUpperLeg"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Hip / Thigh / UpperLeg (右大腿)", ToolTip = "对应戴大腿追踪器的骨骼"))
   FName r_hip_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Knee / Calf / LowerLeg (右小腿)", ToolTip = "右侧小腿骨骼。\n· 对应 UE5: calf_r\n· 对应 Mixamo: RightLeg\n· 对应 VRM: RightLowerLeg"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Knee / Calf / LowerLeg (右小腿)", ToolTip = "对应戴小腿追踪器的骨骼"))
   FName r_knee_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Ankle / Foot (右脚踝/脚部)", ToolTip = "右侧脚踝骨骼。\n· 对应 UE5: foot_r\n· 对应 Mixamo: RightFoot\n· 对应 VRM: RightFoot"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Ankle / Foot (右脚踝/脚部)", ToolTip = "对应戴脚追踪器的骨骼"))
   FName r_ankle_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Foot / Ball / Toe (右脚趾/脚掌球)", ToolTip = "右脚脚尖/前掌骨骼。\n· 对应 UE5: ball_r\n· 对应 Mixamo: RightToeBase\n· 对应 VRM: RightToes"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Foot End / Toe (右脚趾/脚掌球)", ToolTip = "留空，暂无内容"))
   FName r_foot_;
 };

@@ -2,51 +2,20 @@
 #include "rebocap_skeleton_data.h"
 
 URebocapMapData::URebocapMapData() {
-  // 默认使用 UE5 Manny / Quinn 官方预设自动填入
-  PresetTemplate = ERebocapBonePreset::UE5_Mannequin;
-  ApplyPreset(ERebocapBonePreset::UE5_Mannequin);
+  // 默认使用 Unreal Engine (UE4 / UE5 / MetaHuman) 官方标准骨骼预设
+  PresetTemplate = ERebocapBonePreset::Unreal_Engine;
+  ApplyPreset(ERebocapBonePreset::Unreal_Engine);
 }
 
 void URebocapMapData::ApplyPreset(ERebocapBonePreset InPreset) {
   PresetTemplate = InPreset;
 
   switch (InPreset) {
-    case ERebocapBonePreset::UE5_Mannequin:
+    case ERebocapBonePreset::Unreal_Engine:
       rebocap_pelvis_ = TEXT("pelvis");
-      spine1_ = TEXT("spine_01");
-      spine2_ = TEXT("spine_02");
-      spine3_ = TEXT("spine_03");
-      neck_ = TEXT("neck_01");
-      head_ = TEXT("head");
-
-      l_collar_ = TEXT("clavicle_l");
-      l_shoulder_ = TEXT("upperarm_l");
-      l_elbow_ = TEXT("lowerarm_l");
-      l_wrist_ = TEXT("hand_l");
-      l_hand_ = TEXT("index_01_l");
-
-      r_collar_ = TEXT("clavicle_r");
-      r_shoulder_ = TEXT("upperarm_r");
-      r_elbow_ = TEXT("lowerarm_r");
-      r_wrist_ = TEXT("hand_r");
-      r_hand_ = TEXT("index_01_r");
-
-      l_hip_ = TEXT("thigh_l");
-      l_knee_ = TEXT("calf_l");
-      l_ankle_ = TEXT("foot_l");
-      l_foot_ = TEXT("ball_l");
-
-      r_hip_ = TEXT("thigh_r");
-      r_knee_ = TEXT("calf_r");
-      r_ankle_ = TEXT("foot_r");
-      r_foot_ = TEXT("ball_r");
-      break;
-
-    case ERebocapBonePreset::UE4_Mannequin:
-      rebocap_pelvis_ = TEXT("pelvis");
-      spine1_ = TEXT("spine_01");
-      spine2_ = TEXT("spine_02");
-      spine3_ = TEXT("spine_03");
+      spine1_ = TEXT("spine_02"); // 腰椎 (spine) -> spine_02
+      spine2_ = TEXT("spine_04"); // 胸腔 (chest) -> spine_04
+      spine3_ = TEXT("spine_05"); // 上胸 (up chest) -> spine_05
       neck_ = TEXT("neck_01");
       head_ = TEXT("head");
 
