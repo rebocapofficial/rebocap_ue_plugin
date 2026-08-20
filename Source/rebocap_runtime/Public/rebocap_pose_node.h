@@ -101,11 +101,11 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalCon
 
   // 3. 丢包防闪保护 (默认开启)
   /** 控制遇到网络丢包或卡顿断帧时，是否自动保持最后一帧动作，防止角色瞬间闪回 T-Pose（默认开启）。 */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName = "Hold Pose On Dropout (丢包防闪保护)", ToolTip = "控制遇到网络丢包或卡顿断帧时，是否自动保持最后一帧动作，防止角色瞬间闪回 T-Pose（默认开启）。"))
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName = "Hold Pose On Dropout", ToolTip = "When enabled, automatically holds the last valid pose during packet drops or lag spikes to prevent flickering into T-Pose. / 控制遇到网络丢包或卡顿断帧时，是否自动保持最后一帧动作，防止画面闪现 1 帧 T-Pose。"))
   bool bHoldPoseOnDropout = true;
 
   /** 丢包防闪容错超时时间（秒，默认 2.0 秒）：超过该时间未收到新数据才视为彻底断开连接。 */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (EditCondition = "bHoldPoseOnDropout", PinHiddenByDefault, DisplayName = "Dropout Timeout (容错超时秒数)", ClampMin = "0.1", ClampMax = "10.0", ToolTip = "丢包防闪容错超时时间（默认 2.0 秒）。"))
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (EditCondition = "bHoldPoseOnDropout", PinHiddenByDefault, DisplayName = "Dropout Timeout (s)", ClampMin = "0.1", ClampMax = "10.0", ToolTip = "Timeout in seconds before dropping out of pose hold protection. / 丢包防闪容错超时时间（秒）。"))
   float DropoutTimeout = 2.0f;
 
   // -----------------------------
