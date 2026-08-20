@@ -188,7 +188,7 @@ bool FAnimNode_RebocapA2T::IsValidToEvaluate(const USkeleton* Skeleton, const FB
 
 void FAnimNode_RebocapA2T::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseContext& Output, TArray<FBoneTransform>& OutBoneTransforms)
 {
-    check(OutBoneTransforms.Num() == 0);
+    OutBoneTransforms.Reset();
     if (FMath::IsNearlyZero(Alpha))
     {
         return;
@@ -215,7 +215,7 @@ void FAnimNode_RebocapA2T::EvaluateSkeletalControl_AnyThread(FComponentSpacePose
             const FQuat NewCSRotation = CSTransform.GetRotation() * LocalAdditiveQuat;
             CSTransform.SetRotation(NewCSRotation);
 
-            // 写入 OutBoneTransforms，由 UE 引擎原生骨骼解算器自动向下递归更新所有子骨骼与副骨骼空间坐标
+            // 写入 OutBoneTransforms
             OutBoneTransforms.Add(FBoneTransform(CompactIndex, CSTransform));
         }
     };
@@ -241,4 +241,10 @@ void FAnimNode_RebocapA2T::EvaluateSkeletalControl_AnyThread(FComponentSpacePose
     ApplyAdditiveBoneRotation(RightThigh, RightThighOffset);
     ApplyAdditiveBoneRotation(RightCalf, RightCalfOffset);
     ApplyAdditiveBoneRotation(RightFoot, RightFootOffset);
+
+    // 必须按骨骼层级索引升序排列，否则 UE 引擎 LocalBlendCSBoneTransforms 会触发断言断点崩溃
+    if (OutBoneTransforms.Num() > 0)
+    {
+        OutBoneTransforms.Sort(FCompareBoneTransformIndex());
+    }
 }
