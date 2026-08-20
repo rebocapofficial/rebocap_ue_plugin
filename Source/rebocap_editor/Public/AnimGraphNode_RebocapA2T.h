@@ -27,4 +27,7 @@ public:
 
     // 实时同步节点数据至预览视口（无需点击编译即可所见即所得动态预览）
     virtual void CopyNodeDataToPreviewNode(FAnimNode_Base* InPreviewNode) override;
+
+    // 属性修改回调：处理预设一键填充与对称镜像修改
+    virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

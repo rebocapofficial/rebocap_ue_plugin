@@ -6,9 +6,20 @@
 #include "BoneControllers/AnimNode_SkeletalControlBase.h"
 #include "rebocap_a2t_node.generated.h"
 
+/** A-Pose 转 T-Pose 预设模板 */
+UENUM(BlueprintType)
+enum class ERebocapA2TPreset : uint8
+{
+    UE5_Manny_Quinn UMETA(DisplayName = "Unreal Engine 5 (Manny / Quinn / MetaHuman 官方 A-Pose)"),
+    MMD_Standard    UMETA(DisplayName = "MMD / 日本模型通用 A-Pose (~40°)"),
+    VRoid_VRM       UMETA(DisplayName = "VRoid / VRM 常见 A-Pose (~40°)"),
+    Mixamo_APose    UMETA(DisplayName = "Mixamo A-Pose 标准 (~45°)"),
+    Custom          UMETA(DisplayName = "自定义微调 (Custom)")
+};
+
 /**
  * Rebocap 专属四肢与关节 A-Pose 转 T-Pose 姿态校准节点 (Runtime)
- * 支持对肩膀、大臂、小臂、手腕、大腿、小腿、脚部进行全方位的局部旋转累加与数值微调。
+ * 支持对肩膀、大臂、小臂、手腕、大腿、小腿、脚部进行全方位的局部旋转累加、对称修改与预设切换。
  */
 USTRUCT(BlueprintInternalUseOnly)
 struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_SkeletalControlBase
@@ -16,6 +27,21 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_SkeletalContr
     GENERATED_USTRUCT_BODY()
 
     FAnimNode_RebocapA2T();
+
+    // ==========================================
+    // --- 0. 快捷预设与对称控制 ---
+    // ==========================================
+
+    /** 快捷预设选择：切换预设将自动填充下方所有四肢旋转角度 */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷预设与控制 (Presets & Control)", meta = (DisplayName = "选择 A-Pose 预设 (Select Preset)", ToolTip = "选择预设将自动覆盖下方所有四肢旋转角度。"))
+    ERebocapA2TPreset PresetTemplate;
+
+    /** 对称修改 (默认开启)：修改左侧四肢数值时，自动镜像同步到右侧四肢 */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷预设与控制 (Presets & Control)", meta = (DisplayName = "对称修改 (Symmetrical Edit)", ToolTip = "开启后，修改左侧肢体（锁骨/大臂/小臂/手/大腿/小腿/脚）的旋转角度时，自动镜像更新对应的右侧肢体。"))
+    bool bMirrorEdit;
+
+    /** 应用预设角度 */
+    void ApplyPreset(ERebocapA2TPreset InPreset);
 
     // ==========================================
     // --- 1. 左上肢 (Left Arm) ---

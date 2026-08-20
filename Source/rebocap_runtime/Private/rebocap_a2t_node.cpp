@@ -2,8 +2,11 @@
 #include "Animation/AnimInstanceProxy.h"
 
 FAnimNode_RebocapA2T::FAnimNode_RebocapA2T()
+    : PresetTemplate(ERebocapA2TPreset::UE5_Manny_Quinn)
+    , bMirrorEdit(true)
+
     // 1. 左上肢 (Left Arm)
-    : LeftClavicle(TEXT("clavicle_l"))
+    , LeftClavicle(TEXT("clavicle_l"))
     , LeftClavicleOffset(FRotator::ZeroRotator)
     , LeftUpperArm(TEXT("upperarm_l"))
     , LeftUpperArmOffset(0.0f, 0.0f, 50.0f) // Roll/Z +50 抬手
@@ -39,6 +42,98 @@ FAnimNode_RebocapA2T::FAnimNode_RebocapA2T()
     , RightFootOffset(FRotator::ZeroRotator)
 {
     Alpha = 1.0f;
+}
+
+void FAnimNode_RebocapA2T::ApplyPreset(ERebocapA2TPreset InPreset)
+{
+    PresetTemplate = InPreset;
+
+    switch (InPreset)
+    {
+    case ERebocapA2TPreset::UE5_Manny_Quinn:
+        LeftClavicleOffset = FRotator::ZeroRotator;
+        LeftUpperArmOffset = FRotator(0.0f, 0.0f, 50.0f);
+        LeftLowerArmOffset = FRotator::ZeroRotator;
+        LeftHandOffset = FRotator::ZeroRotator;
+
+        RightClavicleOffset = FRotator::ZeroRotator;
+        RightUpperArmOffset = FRotator(0.0f, 0.0f, -50.0f);
+        RightLowerArmOffset = FRotator::ZeroRotator;
+        RightHandOffset = FRotator::ZeroRotator;
+
+        LeftThighOffset = FRotator(0.0f, 0.0f, -5.0f);
+        LeftCalfOffset = FRotator::ZeroRotator;
+        LeftFootOffset = FRotator::ZeroRotator;
+
+        RightThighOffset = FRotator(0.0f, 0.0f, 5.0f);
+        RightCalfOffset = FRotator::ZeroRotator;
+        RightFootOffset = FRotator::ZeroRotator;
+        break;
+
+    case ERebocapA2TPreset::MMD_Standard:
+        LeftClavicleOffset = FRotator::ZeroRotator;
+        LeftUpperArmOffset = FRotator(0.0f, 0.0f, 40.0f);
+        LeftLowerArmOffset = FRotator::ZeroRotator;
+        LeftHandOffset = FRotator::ZeroRotator;
+
+        RightClavicleOffset = FRotator::ZeroRotator;
+        RightUpperArmOffset = FRotator(0.0f, 0.0f, -40.0f);
+        RightLowerArmOffset = FRotator::ZeroRotator;
+        RightHandOffset = FRotator::ZeroRotator;
+
+        LeftThighOffset = FRotator::ZeroRotator;
+        LeftCalfOffset = FRotator::ZeroRotator;
+        LeftFootOffset = FRotator::ZeroRotator;
+
+        RightThighOffset = FRotator::ZeroRotator;
+        RightCalfOffset = FRotator::ZeroRotator;
+        RightFootOffset = FRotator::ZeroRotator;
+        break;
+
+    case ERebocapA2TPreset::VRoid_VRM:
+        LeftClavicleOffset = FRotator::ZeroRotator;
+        LeftUpperArmOffset = FRotator(0.0f, 0.0f, 40.0f);
+        LeftLowerArmOffset = FRotator::ZeroRotator;
+        LeftHandOffset = FRotator::ZeroRotator;
+
+        RightClavicleOffset = FRotator::ZeroRotator;
+        RightUpperArmOffset = FRotator(0.0f, 0.0f, -40.0f);
+        RightLowerArmOffset = FRotator::ZeroRotator;
+        RightHandOffset = FRotator::ZeroRotator;
+
+        LeftThighOffset = FRotator::ZeroRotator;
+        LeftCalfOffset = FRotator::ZeroRotator;
+        LeftFootOffset = FRotator::ZeroRotator;
+
+        RightThighOffset = FRotator::ZeroRotator;
+        RightCalfOffset = FRotator::ZeroRotator;
+        RightFootOffset = FRotator::ZeroRotator;
+        break;
+
+    case ERebocapA2TPreset::Mixamo_APose:
+        LeftClavicleOffset = FRotator::ZeroRotator;
+        LeftUpperArmOffset = FRotator(0.0f, 0.0f, 45.0f);
+        LeftLowerArmOffset = FRotator::ZeroRotator;
+        LeftHandOffset = FRotator::ZeroRotator;
+
+        RightClavicleOffset = FRotator::ZeroRotator;
+        RightUpperArmOffset = FRotator(0.0f, 0.0f, -45.0f);
+        RightLowerArmOffset = FRotator::ZeroRotator;
+        RightHandOffset = FRotator::ZeroRotator;
+
+        LeftThighOffset = FRotator::ZeroRotator;
+        LeftCalfOffset = FRotator::ZeroRotator;
+        LeftFootOffset = FRotator::ZeroRotator;
+
+        RightThighOffset = FRotator::ZeroRotator;
+        RightCalfOffset = FRotator::ZeroRotator;
+        RightFootOffset = FRotator::ZeroRotator;
+        break;
+
+    case ERebocapA2TPreset::Custom:
+    default:
+        break;
+    }
 }
 
 void FAnimNode_RebocapA2T::InitializeBoneReferences(const FBoneContainer& RequiredBones)
