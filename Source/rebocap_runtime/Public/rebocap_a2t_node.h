@@ -53,12 +53,6 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_SkeletalContr
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. 旋转偏移 (Offsets)", meta = (PinShownByDefault, DisplayName = "Right Thigh Offset (右大腿旋转偏移)"))
     FRotator RightThighOffset;
 
-    // --- 3. 权重控制 (Weight / Alpha) ---
-
-    /** 校准生效强度 (0.0 = 不改变原始姿态, 1.0 = 100% 展开为 T-Pose) */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "3. 权重 (Alpha)", meta = (PinShownByDefault, ClampMin = "0.0", ClampMax = "1.0", DisplayName = "Alpha (校准强度权重)"))
-    float Alpha;
-
     // --- 虚函数重写 ---
     virtual void EvaluateSkeletalControl_AnyThread(FComponentSpacePoseContext& Output, TArray<FBoneTransform>& OutBoneTransforms) override;
     virtual bool IsValidToEvaluate(const USkeleton* Skeleton, const FBoneContainer& RequiredBones) override;

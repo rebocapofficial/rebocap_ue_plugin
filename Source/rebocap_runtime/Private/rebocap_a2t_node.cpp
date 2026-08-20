@@ -10,8 +10,8 @@ FAnimNode_RebocapA2T::FAnimNode_RebocapA2T()
     , RightArmOffset(0.0f, 0.0f, -50.0f)   // Roll/Z -50 度抬手
     , LeftThighOffset(0.0f, 0.0f, -5.0f)   // 双腿微调收拢
     , RightThighOffset(0.0f, 0.0f, 5.0f)   // 双腿微调收拢
-    , Alpha(1.0f)
 {
+    Alpha = 1.0f;
 }
 
 void FAnimNode_RebocapA2T::InitializeBoneReferences(const FBoneContainer& RequiredBones)
