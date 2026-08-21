@@ -202,7 +202,7 @@ FString FAnimNode_RebocapA2T::ToJsonString() const
     TSharedPtr<FJsonObject> RootObject = MakeShared<FJsonObject>();
     RootObject->SetStringField(TEXT("version"), TEXT("2.0"));
     RootObject->SetStringField(TEXT("type"), TEXT("rebocap_a2t_calibration"));
-    RootObject->SetIntegerField(TEXT("preset_template"), static_cast<int32>(PresetTemplate));
+    RootObject->SetNumberField(TEXT("preset_template"), static_cast<int32>(PresetTemplate));
 
     // 对称设置
     TSharedPtr<FJsonObject> MirrorObject = MakeShared<FJsonObject>();

@@ -4,7 +4,7 @@
 #include "DetailWidgetRow.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Text/STextBlock.h"
-#include "Widgets/Layout/SHorizontalBox.h"
+#include "Widgets/SBoxPanel.h"
 #include "AnimGraphNode_RebocapA2T.h"
 
 #define LOCTEXT_NAMESPACE "RebocapA2TDetails"
