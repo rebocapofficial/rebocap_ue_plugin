@@ -15,12 +15,6 @@
 	"IsExperimentalVersion": false,
 	"Installed": false,
 	"EnabledByDefault": true,
-	"LocalizationTargets": [
-		{
-			"Name": "rebocap",
-			"LoadingPolicy": "Always"
-		}
-	],
 	"Modules": [
 		{
 			"Name": "rebocap_runtime",
