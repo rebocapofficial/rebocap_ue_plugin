@@ -44,6 +44,13 @@ void UAnimGraphNode_RebocapA2T::CopyNodeDataToPreviewNode(FAnimNode_Base* InPrev
     PreviewNode->RightCalfOffset = Node.RightCalfOffset;
     PreviewNode->RightFootOffset = Node.RightFootOffset;
 
+    PreviewNode->PelvisOffset = Node.PelvisOffset;
+    PreviewNode->SpineOffset = Node.SpineOffset;
+    PreviewNode->ChestOffset = Node.ChestOffset;
+    PreviewNode->UpChestOffset = Node.UpChestOffset;
+    PreviewNode->NeckOffset = Node.NeckOffset;
+    PreviewNode->HeadOffset = Node.HeadOffset;
+
     PreviewNode->Alpha = Node.Alpha;
 }
 

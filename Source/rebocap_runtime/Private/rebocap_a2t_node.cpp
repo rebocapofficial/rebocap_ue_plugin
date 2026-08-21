@@ -43,6 +43,20 @@ FAnimNode_RebocapA2T::FAnimNode_RebocapA2T()
     , RightCalfOffset(FRotator::ZeroRotator)
     , RightFoot(TEXT("foot_r"))
     , RightFootOffset(FRotator::ZeroRotator)
+
+    // 5. 躯干与头部 (Spine & Torso & Head)
+    , Pelvis(TEXT("pelvis"))
+    , PelvisOffset(FRotator::ZeroRotator)
+    , Spine(TEXT("spine_02"))
+    , SpineOffset(FRotator::ZeroRotator)
+    , Chest(TEXT("spine_04"))
+    , ChestOffset(FRotator::ZeroRotator)
+    , UpChest(TEXT("spine_05"))
+    , UpChestOffset(FRotator::ZeroRotator)
+    , Neck(TEXT("neck_01"))
+    , NeckOffset(FRotator::ZeroRotator)
+    , Head(TEXT("head"))
+    , HeadOffset(FRotator::ZeroRotator)
     , Alpha(1.0f)
 {
 }
@@ -75,6 +89,13 @@ void FAnimNode_RebocapA2T::ApplyPreset(ERebocapA2TPreset InPreset)
         RightThighOffset = FRotator(-3.0f, 0.0f, -5.0f);
         RightCalfOffset  = FRotator::ZeroRotator;
         RightFootOffset  = FRotator::ZeroRotator;
+
+        PelvisOffset     = FRotator::ZeroRotator;
+        SpineOffset      = FRotator::ZeroRotator;
+        ChestOffset      = FRotator::ZeroRotator;
+        UpChestOffset    = FRotator::ZeroRotator;
+        NeckOffset       = FRotator::ZeroRotator;
+        HeadOffset       = FRotator::ZeroRotator;
         break;
 
     case ERebocapA2TPreset::MMD_Standard:
@@ -99,6 +120,13 @@ void FAnimNode_RebocapA2T::ApplyPreset(ERebocapA2TPreset InPreset)
         RightThighOffset = FRotator::ZeroRotator;
         RightCalfOffset  = FRotator::ZeroRotator;
         RightFootOffset  = FRotator::ZeroRotator;
+
+        PelvisOffset     = FRotator::ZeroRotator;
+        SpineOffset      = FRotator::ZeroRotator;
+        ChestOffset      = FRotator::ZeroRotator;
+        UpChestOffset    = FRotator::ZeroRotator;
+        NeckOffset       = FRotator::ZeroRotator;
+        HeadOffset       = FRotator::ZeroRotator;
         break;
 
     case ERebocapA2TPreset::VRoid_VRM:
@@ -123,6 +151,13 @@ void FAnimNode_RebocapA2T::ApplyPreset(ERebocapA2TPreset InPreset)
         RightThighOffset = FRotator::ZeroRotator;
         RightCalfOffset  = FRotator::ZeroRotator;
         RightFootOffset  = FRotator::ZeroRotator;
+
+        PelvisOffset     = FRotator::ZeroRotator;
+        SpineOffset      = FRotator::ZeroRotator;
+        ChestOffset      = FRotator::ZeroRotator;
+        UpChestOffset    = FRotator::ZeroRotator;
+        NeckOffset       = FRotator::ZeroRotator;
+        HeadOffset       = FRotator::ZeroRotator;
         break;
 
     case ERebocapA2TPreset::Mixamo_APose:
@@ -147,6 +182,13 @@ void FAnimNode_RebocapA2T::ApplyPreset(ERebocapA2TPreset InPreset)
         RightThighOffset = FRotator::ZeroRotator;
         RightCalfOffset  = FRotator::ZeroRotator;
         RightFootOffset  = FRotator::ZeroRotator;
+
+        PelvisOffset     = FRotator::ZeroRotator;
+        SpineOffset      = FRotator::ZeroRotator;
+        ChestOffset      = FRotator::ZeroRotator;
+        UpChestOffset    = FRotator::ZeroRotator;
+        NeckOffset       = FRotator::ZeroRotator;
+        HeadOffset       = FRotator::ZeroRotator;
         break;
 
     case ERebocapA2TPreset::Custom:
@@ -186,6 +228,13 @@ void FAnimNode_RebocapA2T::CacheBones_AnyThread(const FAnimationCacheBonesContex
     RightThigh.Initialize(RequiredBones);
     RightCalf.Initialize(RequiredBones);
     RightFoot.Initialize(RequiredBones);
+
+    Pelvis.Initialize(RequiredBones);
+    Spine.Initialize(RequiredBones);
+    Chest.Initialize(RequiredBones);
+    UpChest.Initialize(RequiredBones);
+    Neck.Initialize(RequiredBones);
+    Head.Initialize(RequiredBones);
 }
 
 void FAnimNode_RebocapA2T::Update_AnyThread(const FAnimationUpdateContext& Context)
@@ -248,6 +297,14 @@ void FAnimNode_RebocapA2T::Evaluate_AnyThread(FPoseContext& Output)
     ApplyLocalRotation(RightThigh, RightThighOffset);
     ApplyLocalRotation(RightCalf, RightCalfOffset);
     ApplyLocalRotation(RightFoot, RightFootOffset);
+
+    // 5. 躯干与头部 (Spine & Torso & Head)
+    ApplyLocalRotation(Pelvis, PelvisOffset);
+    ApplyLocalRotation(Spine, SpineOffset);
+    ApplyLocalRotation(Chest, ChestOffset);
+    ApplyLocalRotation(UpChest, UpChestOffset);
+    ApplyLocalRotation(Neck, NeckOffset);
+    ApplyLocalRotation(Head, HeadOffset);
 }
 
 void FAnimNode_RebocapA2T::GatherDebugData(FNodeDebugData& DebugData)

@@ -187,6 +187,58 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (PinHiddenByDefault, DisplayName = "Right Foot Offset", ToolTip = "Right foot rotation offset in local space. / 右脚踝局部旋转偏移。"))
     FRotator RightFootOffset;
 
+    // ==========================================
+    // --- 5. Spine & Torso & Head ---
+    // ==========================================
+
+    /** Pelvis Bone */
+    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Pelvis Bone"))
+    FBoneReference Pelvis;
+
+    /** Pelvis Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Pelvis Offset", ToolTip = "Pelvis rotation offset in local space. / 骨盆/根骨骼局部旋转偏移。"))
+    FRotator PelvisOffset;
+
+    /** Spine / Waist Bone */
+    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Spine / Waist Bone"))
+    FBoneReference Spine;
+
+    /** Spine / Waist Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Spine / Waist Offset", ToolTip = "Spine/waist rotation offset in local space. / 腰椎/脊柱局部旋转偏移。"))
+    FRotator SpineOffset;
+
+    /** Chest Bone */
+    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Chest Bone"))
+    FBoneReference Chest;
+
+    /** Chest Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Chest Offset", ToolTip = "Chest rotation offset in local space. / 胸腔局部旋转偏移。"))
+    FRotator ChestOffset;
+
+    /** Up Chest Bone */
+    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Up Chest Bone"))
+    FBoneReference UpChest;
+
+    /** Up Chest Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Up Chest Offset", ToolTip = "Up chest rotation offset in local space. / 上胸局部旋转偏移。"))
+    FRotator UpChestOffset;
+
+    /** Neck Bone */
+    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Neck Bone"))
+    FBoneReference Neck;
+
+    /** Neck Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Neck Offset", ToolTip = "Neck rotation offset in local space. / 颈部/脖子局部旋转偏移。"))
+    FRotator NeckOffset;
+
+    /** Head Bone */
+    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Head Bone"))
+    FBoneReference Head;
+
+    /** Head Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Head Offset", ToolTip = "Head rotation offset in local space. / 头部局部旋转偏移。"))
+    FRotator HeadOffset;
+
     /** Alpha Weight */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (PinShownByDefault, ClampMin = "0.0", ClampMax = "1.0", DisplayName = "Alpha", ToolTip = "A2T 姿态校准强度权重 / Alpha."))
     float Alpha;
