@@ -9,7 +9,7 @@ FText UAnimGraphNode_RebocapA2T::GetNodeTitle(ENodeTitleType::Type TitleType) co
 
 FText UAnimGraphNode_RebocapA2T::GetTooltipText() const
 {
-    return LOCTEXT("RebocapA2TNodeTooltip", "Calibrates A-Pose characters (e.g. UE5 Manny/Quinn, MetaHuman) into standard T-Pose for Rebocap motion capture.");
+    return LOCTEXT("RebocapA2TNodeTooltip", "搭配Rebocap的修正节点，用来修正a-pose角色的偏转。");
 }
 
 FText UAnimGraphNode_RebocapA2T::GetMenuCategory() const

@@ -37,23 +37,23 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     // ==========================================
 
     /** Preset Template */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (PinHiddenByDefault, DisplayName = "Preset Template", ToolTip = "Select an A-Pose preset to auto-fill limb rotation offsets. / 选择预设将自动覆盖下方所有四肢旋转角度。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (PinHiddenByDefault, DisplayName = "Preset Template", ToolTip = "快捷预设模板。 / Preset Template."))
     ERebocapA2TPreset PresetTemplate;
 
     /** Symmetrical Edit (Mirror left changes to right) */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (PinHiddenByDefault, DisplayName = "Symmetrical Edit", ToolTip = "When enabled, edits on the left limbs will automatically mirror to the right limbs. / 开启后，修改左侧肢体的旋转角度时，自动镜像更新对应的右侧肢体。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (PinHiddenByDefault, DisplayName = "Symmetrical Edit", ToolTip = "对称修改开关（默认开启）。 / Symmetrical Edit (Default ON)."))
     bool bMirrorEdit;
 
     /** Mirror Invert Roll (X) */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (EditCondition = "bMirrorEdit", PinHiddenByDefault, DisplayName = "Invert Roll (-X / +X)", ToolTip = "When checked, inverts the X (Roll) axis on the right side (-X); when unchecked, keeps the same sign (+X). / 勾选后右侧 X 符号反转 (-X)；未勾选则保持同向 (+X)。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (EditCondition = "bMirrorEdit", PinHiddenByDefault, DisplayName = "Invert Roll (-X / +X)", ToolTip = "X轴对称反转 (默认关闭)。 / Invert Roll (-X / +X)."))
     bool bMirrorInvertRoll;
 
     /** Mirror Invert Pitch (Y) */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (EditCondition = "bMirrorEdit", PinHiddenByDefault, DisplayName = "Invert Pitch (-Y / +Y)", ToolTip = "When checked, inverts the Y (Pitch) axis on the right side (-Y); when unchecked, keeps the same sign (+Y). / 勾选后右侧 Y 符号反转 (-Y)；未勾选则保持同向 (+Y)。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (EditCondition = "bMirrorEdit", PinHiddenByDefault, DisplayName = "Invert Pitch (-Y / +Y)", ToolTip = "Y轴对称反转 (默认关闭)。 / Invert Pitch (-Y / +Y)."))
     bool bMirrorInvertPitch;
 
     /** Mirror Invert Yaw (Z) */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (EditCondition = "bMirrorEdit", PinHiddenByDefault, DisplayName = "Invert Yaw (-Z / +Z)", ToolTip = "When checked, inverts the Z (Yaw) axis on the right side (-Z); when unchecked, keeps the same sign (+Z). / 勾选后右侧 Z 符号反转 (-Z)；未勾选则保持同向 (+Z)。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (EditCondition = "bMirrorEdit", PinHiddenByDefault, DisplayName = "Invert Yaw (-Z / +Z)", ToolTip = "Z轴对称反转 (默认关闭)。 / Invert Yaw (-Z / +Z)."))
     bool bMirrorInvertYaw;
 
     /** Apply preset angles */
@@ -188,7 +188,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     FRotator RightFootOffset;
 
     /** Alpha Weight */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (PinShownByDefault, ClampMin = "0.0", ClampMax = "1.0", DisplayName = "Alpha", ToolTip = "Blend weight (0.0 = original pose, 1.0 = full T-Pose calibration). / 校准生效强度权重。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (PinShownByDefault, ClampMin = "0.0", ClampMax = "1.0", DisplayName = "Alpha", ToolTip = "A2T 姿态校准强度权重 / Alpha."))
     float Alpha;
 
     // --- 虚函数重写 ---
