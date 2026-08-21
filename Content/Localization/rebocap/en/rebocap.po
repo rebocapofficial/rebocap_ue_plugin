@@ -1,0 +1,59 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: rebocap\n"
+"POT-Creation-Date: 2026-08-21 13:00\n"
+"PO-Revision-Date: 2026-08-21 13:00\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: [RebocapA2TAnimGraphNode]RebocapA2TNodeTitle
+msgid "Rebocap A-Pose to T-Pose"
+msgstr "Rebocap A-Pose to T-Pose"
+
+#: [RebocapA2TAnimGraphNode]RebocapA2TNodeTooltip
+msgid "Calibrates A-Pose characters into standard T-Pose for Rebocap motion capture."
+msgstr "Calibrates A-Pose characters into standard T-Pose for Rebocap motion capture."
+
+#: [RebocapA2TAnimGraphNode]RebocapA2TCategory
+msgid "Rebocap"
+msgstr "Rebocap"
+
+#: [RebocapA2TAnimGraphNode]RebocapA2TKeywords
+msgid "rebocap, a2t, tpose, a-pose, t-pose, calibrate, limb, mocap, live link"
+msgstr "rebocap, a2t, tpose, a-pose, t-pose, calibrate, limb, mocap, live link"
+
+#: [RebocapAnimGraphNode]RebocapPoseNodeTitle
+msgid "Rebocap Body Pose"
+msgstr "Rebocap Body Pose"
+
+#: [RebocapAnimGraphNode]RebocapPoseNodeTooltip
+msgid "Drives skeletal mesh with real-time Rebocap LiveLink motion capture data via bone retarget mapping."
+msgstr "Drives skeletal mesh with real-time Rebocap LiveLink motion capture data via bone retarget mapping."
+
+#: [RebocapAnimGraphNode]RebocapPoseCategory
+msgid "Rebocap"
+msgstr "Rebocap"
+
+#: [RebocapAnimGraphNode]RebocapPoseKeywords
+msgid "rebocap, mocap, live link, pose, skeleton, motion capture"
+msgstr "rebocap, mocap, live link, pose, skeleton, motion capture"
+
+#: [RebocapSourceEditor]Port
+msgid "Port"
+msgstr "Port"
+
+#: [RebocapSourceEditor]Connect
+msgid "Connect"
+msgstr "Connect"
+
+#: [RebocapSourceFactory]SourceDisplayName
+msgid "Rebocap Source"
+msgstr "Rebocap Source"
+
+#: [RebocapSourceFactory]SourceTooltip
+msgid "Creates a connection to a Rebocap Source"
+msgstr "Creates a connection to a Rebocap Source"

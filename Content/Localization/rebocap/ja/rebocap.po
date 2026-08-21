@@ -1,0 +1,59 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: rebocap\n"
+"POT-Creation-Date: 2026-08-21 13:00\n"
+"PO-Revision-Date: 2026-08-21 13:00\n"
+"Language-Team: \n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: [RebocapA2TAnimGraphNode]RebocapA2TNodeTitle
+msgid "Rebocap A-Pose to T-Pose"
+msgstr "Rebocap A-PoseからT-Poseへ変換 (A2T)"
+
+#: [RebocapA2TAnimGraphNode]RebocapA2TNodeTooltip
+msgid "Calibrates A-Pose characters into standard T-Pose for Rebocap motion capture."
+msgstr "Rebocap用の補正ノード。A-Poseキャラクターの四肢をT-Poseに補正します。"
+
+#: [RebocapA2TAnimGraphNode]RebocapA2TCategory
+msgid "Rebocap"
+msgstr "Rebocap"
+
+#: [RebocapA2TAnimGraphNode]RebocapA2TKeywords
+msgid "rebocap, a2t, tpose, a-pose, t-pose, calibrate, limb, mocap, live link"
+msgstr "rebocap, a2t, tpose, a-pose, t-pose, calibrate, キャリブレーション, モーキャプ, ポーズ"
+
+#: [RebocapAnimGraphNode]RebocapPoseNodeTitle
+msgid "Rebocap Body Pose"
+msgstr "Rebocap ボディポーズ (Body Pose)"
+
+#: [RebocapAnimGraphNode]RebocapPoseNodeTooltip
+msgid "Drives skeletal mesh with real-time Rebocap LiveLink motion capture data via bone retarget mapping."
+msgstr "Rebocapのリアルタイムモーションキャプチャを受信し、ボーンリマップ経由でキャラクターを駆動します。"
+
+#: [RebocapAnimGraphNode]RebocapPoseCategory
+msgid "Rebocap"
+msgstr "Rebocap"
+
+#: [RebocapAnimGraphNode]RebocapPoseKeywords
+msgid "rebocap, mocap, live link, pose, skeleton, motion capture"
+msgstr "rebocap, mocap, live link, モーキャプ, ポーズ, スケルトン"
+
+#: [RebocapSourceEditor]Port
+msgid "Port"
+msgstr "ポート"
+
+#: [RebocapSourceEditor]Connect
+msgid "Connect"
+msgstr "接続"
+
+#: [RebocapSourceFactory]SourceDisplayName
+msgid "Rebocap Source"
+msgstr "Rebocap ソース"
+
+#: [RebocapSourceFactory]SourceTooltip
+msgid "Creates a connection to a Rebocap Source"
+msgstr "Rebocap ソースへの接続を作成します"
