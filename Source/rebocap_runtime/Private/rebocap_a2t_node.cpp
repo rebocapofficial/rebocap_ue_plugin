@@ -1,5 +1,8 @@
 #include "rebocap_a2t_node.h"
 #include "Animation/AnimInstanceProxy.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
 
 FAnimNode_RebocapA2T::FAnimNode_RebocapA2T()
     : PresetTemplate(ERebocapA2TPreset::UE5_Manny_Quinn)
