@@ -28,4 +28,8 @@ public:
 
     // 属性修改回调：处理预设一键填充与对称镜像修改
     virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+    // JSON 导出与导入
+    void ExportToJson();
+    void ImportFromJson();
 };

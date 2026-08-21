@@ -1,5 +1,14 @@
 #include "AnimGraphNode_RebocapA2T.h"
 
+#if WITH_EDITOR
+#include "DesktopPlatformModule.h"
+#include "IDesktopPlatform.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Misc/MessageDialog.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
+#endif
+
 #define LOCTEXT_NAMESPACE "RebocapA2TAnimGraphNode"
 
 FText UAnimGraphNode_RebocapA2T::GetNodeTitle(ENodeTitleType::Type TitleType) const
@@ -91,6 +100,79 @@ void UAnimGraphNode_RebocapA2T::PostEditChangeProperty(FPropertyChangedEvent& Pr
         Node.RightCalfOffset     = MirrorRot(Node.LeftCalfOffset);
         Node.RightFootOffset     = MirrorRot(Node.LeftFootOffset);
     }
+}
+
+void UAnimGraphNode_RebocapA2T::ExportToJson()
+{
+#if WITH_EDITOR
+    IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+    if (!DesktopPlatform) return;
+
+    const void* ParentWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
+    const FString DefaultPath = FPaths::ProjectSavedDir();
+    const FString DefaultFile = TEXT("Rebocap_A2T_Config.json");
+    TArray<FString> OutFilenames;
+
+    const bool bSaved = DesktopPlatform->SaveFileDialog(
+        ParentWindowHandle,
+        TEXT("导出 Rebocap A2T 姿态校准为 JSON 文件"),
+        DefaultPath,
+        DefaultFile,
+        TEXT("JSON 文件 (*.json)|*.json"),
+        EFileDialogFlags::None,
+        OutFilenames);
+
+    if (bSaved && OutFilenames.Num() > 0)
+    {
+        const FString SaveFilePath = OutFilenames[0];
+        const FString JsonContent = Node.ToJsonString();
+        if (FFileHelper::SaveStringToFile(JsonContent, *SaveFilePath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
+        {
+            UE_LOG(LogTemp, Display, TEXT("成功导出 A2T 配置至: %s"), *SaveFilePath);
+            FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(FString::Printf(TEXT("成功导出 A2T 配置至：\n%s"), *SaveFilePath)));
+        }
+    }
+#endif
+}
+
+void UAnimGraphNode_RebocapA2T::ImportFromJson()
+{
+#if WITH_EDITOR
+    IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+    if (!DesktopPlatform) return;
+
+    const void* ParentWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
+    const FString DefaultPath = FPaths::ProjectSavedDir();
+    TArray<FString> OutFilenames;
+
+    const bool bOpened = DesktopPlatform->OpenFileDialog(
+        ParentWindowHandle,
+        TEXT("选择要导入的 Rebocap A2T 配置文件"),
+        DefaultPath,
+        TEXT(""),
+        TEXT("JSON 文件 (*.json)|*.json"),
+        EFileDialogFlags::None,
+        OutFilenames);
+
+    if (bOpened && OutFilenames.Num() > 0)
+    {
+        const FString OpenFilePath = OutFilenames[0];
+        FString JsonString;
+        if (FFileHelper::LoadFileToString(JsonString, *OpenFilePath))
+        {
+            if (Node.FromJsonString(JsonString))
+            {
+                MarkPackageDirty();
+                UE_LOG(LogTemp, Display, TEXT("成功导入 A2T 配置: %s"), *OpenFilePath);
+                FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(FString::Printf(TEXT("成功导入 A2T 配置！\n已还原所有肢体旋转与骨骼绑定。"))));
+            }
+            else
+            {
+                FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("导入失败：JSON 格式不符合 A2T 规范！")));
+            }
+        }
+    }
+#endif
 }
 
 #undef LOCTEXT_NAMESPACE

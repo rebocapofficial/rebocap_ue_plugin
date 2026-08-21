@@ -197,6 +197,219 @@ void FAnimNode_RebocapA2T::ApplyPreset(ERebocapA2TPreset InPreset)
     }
 }
 
+FString FAnimNode_RebocapA2T::ToJsonString() const
+{
+    TSharedPtr<FJsonObject> RootObject = MakeShared<FJsonObject>();
+    RootObject->SetStringField(TEXT("version"), TEXT("2.0"));
+    RootObject->SetStringField(TEXT("type"), TEXT("rebocap_a2t_calibration"));
+    RootObject->SetIntegerField(TEXT("preset_template"), static_cast<int32>(PresetTemplate));
+
+    // 对称设置
+    TSharedPtr<FJsonObject> MirrorObject = MakeShared<FJsonObject>();
+    MirrorObject->SetBoolField(TEXT("mirror_edit"), bMirrorEdit);
+    MirrorObject->SetBoolField(TEXT("invert_roll"), bMirrorInvertRoll);
+    MirrorObject->SetBoolField(TEXT("invert_pitch"), bMirrorInvertPitch);
+    MirrorObject->SetBoolField(TEXT("invert_yaw"), bMirrorInvertYaw);
+    RootObject->SetObjectField(TEXT("mirror_settings"), MirrorObject);
+
+    // 旋转偏移
+    TSharedPtr<FJsonObject> RotObject = MakeShared<FJsonObject>();
+    auto WriteRot = [&](const TCHAR* Key, const FRotator& Rot)
+    {
+        TArray<TSharedPtr<FJsonValue>> Arr;
+        Arr.Add(MakeShared<FJsonValueNumber>(Rot.Pitch));
+        Arr.Add(MakeShared<FJsonValueNumber>(Rot.Yaw));
+        Arr.Add(MakeShared<FJsonValueNumber>(Rot.Roll));
+        RotObject->SetArrayField(Key, Arr);
+    };
+
+    WriteRot(TEXT("left_clavicle"), LeftClavicleOffset);
+    WriteRot(TEXT("left_upperarm"), LeftUpperArmOffset);
+    WriteRot(TEXT("left_lowerarm"), LeftLowerArmOffset);
+    WriteRot(TEXT("left_hand"), LeftHandOffset);
+
+    WriteRot(TEXT("right_clavicle"), RightClavicleOffset);
+    WriteRot(TEXT("right_upperarm"), RightUpperArmOffset);
+    WriteRot(TEXT("right_lowerarm"), RightLowerArmOffset);
+    WriteRot(TEXT("right_hand"), RightHandOffset);
+
+    WriteRot(TEXT("left_thigh"), LeftThighOffset);
+    WriteRot(TEXT("left_calf"), LeftCalfOffset);
+    WriteRot(TEXT("left_foot"), LeftFootOffset);
+
+    WriteRot(TEXT("right_thigh"), RightThighOffset);
+    WriteRot(TEXT("right_calf"), RightCalfOffset);
+    WriteRot(TEXT("right_foot"), RightFootOffset);
+
+    WriteRot(TEXT("pelvis"), PelvisOffset);
+    WriteRot(TEXT("spine"), SpineOffset);
+    WriteRot(TEXT("chest"), ChestOffset);
+    WriteRot(TEXT("up_chest"), UpChestOffset);
+    WriteRot(TEXT("neck"), NeckOffset);
+    WriteRot(TEXT("head"), HeadOffset);
+    RootObject->SetObjectField(TEXT("bone_rotations"), RotObject);
+
+    // 骨骼绑定名称
+    TSharedPtr<FJsonObject> BonesObject = MakeShared<FJsonObject>();
+    BonesObject->SetStringField(TEXT("left_clavicle"), LeftClavicle.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("left_upperarm"), LeftUpperArm.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("left_lowerarm"), LeftLowerArm.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("left_hand"), LeftHand.BoneName.ToString());
+
+    BonesObject->SetStringField(TEXT("right_clavicle"), RightClavicle.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("right_upperarm"), RightUpperArm.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("right_lowerarm"), RightLowerArm.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("right_hand"), RightHand.BoneName.ToString());
+
+    BonesObject->SetStringField(TEXT("left_thigh"), LeftThigh.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("left_calf"), LeftCalf.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("left_foot"), LeftFoot.BoneName.ToString());
+
+    BonesObject->SetStringField(TEXT("right_thigh"), RightThigh.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("right_calf"), RightCalf.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("right_foot"), RightFoot.BoneName.ToString());
+
+    BonesObject->SetStringField(TEXT("pelvis"), Pelvis.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("spine"), Spine.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("chest"), Chest.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("up_chest"), UpChest.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("neck"), Neck.BoneName.ToString());
+    BonesObject->SetStringField(TEXT("head"), Head.BoneName.ToString());
+    RootObject->SetObjectField(TEXT("bone_names"), BonesObject);
+
+    RootObject->SetNumberField(TEXT("alpha"), Alpha);
+
+    FString OutputString;
+    TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&OutputString);
+    FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer);
+
+    return OutputString;
+}
+
+bool FAnimNode_RebocapA2T::FromJsonString(const FString& InJsonString)
+{
+    TSharedPtr<FJsonObject> RootObject;
+    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(InJsonString);
+    if (!FJsonSerializer::Deserialize(Reader, RootObject) || !RootObject.IsValid())
+    {
+        return false;
+    }
+
+    PresetTemplate = ERebocapA2TPreset::Custom;
+
+    // 1. 对称设置
+    if (RootObject->HasField(TEXT("mirror_settings")))
+    {
+        TSharedPtr<FJsonObject> MirrorObject = RootObject->GetObjectField(TEXT("mirror_settings"));
+        if (MirrorObject.IsValid())
+        {
+            if (MirrorObject->HasField(TEXT("mirror_edit"))) bMirrorEdit = MirrorObject->GetBoolField(TEXT("mirror_edit"));
+            if (MirrorObject->HasField(TEXT("invert_roll"))) bMirrorInvertRoll = MirrorObject->GetBoolField(TEXT("invert_roll"));
+            if (MirrorObject->HasField(TEXT("invert_pitch"))) bMirrorInvertPitch = MirrorObject->GetBoolField(TEXT("invert_pitch"));
+            if (MirrorObject->HasField(TEXT("invert_yaw"))) bMirrorInvertYaw = MirrorObject->GetBoolField(TEXT("invert_yaw"));
+        }
+    }
+
+    // 2. 旋转偏移
+    if (RootObject->HasField(TEXT("bone_rotations")))
+    {
+        TSharedPtr<FJsonObject> RotObject = RootObject->GetObjectField(TEXT("bone_rotations"));
+        if (RotObject.IsValid())
+        {
+            auto ReadRot = [&](const TCHAR* Key, FRotator& OutRot)
+            {
+                if (RotObject->HasField(Key))
+                {
+                    TArray<TSharedPtr<FJsonValue>> Arr = RotObject->GetArrayField(Key);
+                    if (Arr.Num() >= 3)
+                    {
+                        OutRot.Pitch = Arr[0]->AsNumber();
+                        OutRot.Yaw = Arr[1]->AsNumber();
+                        OutRot.Roll = Arr[2]->AsNumber();
+                    }
+                }
+            };
+
+            ReadRot(TEXT("left_clavicle"), LeftClavicleOffset);
+            ReadRot(TEXT("left_upperarm"), LeftUpperArmOffset);
+            ReadRot(TEXT("left_lowerarm"), LeftLowerArmOffset);
+            ReadRot(TEXT("left_hand"), LeftHandOffset);
+
+            ReadRot(TEXT("right_clavicle"), RightClavicleOffset);
+            ReadRot(TEXT("right_upperarm"), RightUpperArmOffset);
+            ReadRot(TEXT("right_lowerarm"), RightLowerArmOffset);
+            ReadRot(TEXT("right_hand"), RightHandOffset);
+
+            ReadRot(TEXT("left_thigh"), LeftThighOffset);
+            ReadRot(TEXT("left_calf"), LeftCalfOffset);
+            ReadRot(TEXT("left_foot"), LeftFootOffset);
+
+            ReadRot(TEXT("right_thigh"), RightThighOffset);
+            ReadRot(TEXT("right_calf"), RightCalfOffset);
+            ReadRot(TEXT("right_foot"), RightFootOffset);
+
+            ReadRot(TEXT("pelvis"), PelvisOffset);
+            ReadRot(TEXT("spine"), SpineOffset);
+            ReadRot(TEXT("chest"), ChestOffset);
+            ReadRot(TEXT("up_chest"), UpChestOffset);
+            ReadRot(TEXT("neck"), NeckOffset);
+            ReadRot(TEXT("head"), HeadOffset);
+        }
+    }
+
+    // 3. 骨骼绑定名称
+    if (RootObject->HasField(TEXT("bone_names")))
+    {
+        TSharedPtr<FJsonObject> BonesObject = RootObject->GetObjectField(TEXT("bone_names"));
+        if (BonesObject.IsValid())
+        {
+            auto ReadBone = [&](const TCHAR* Key, FBoneReference& BoneRef)
+            {
+                if (BonesObject->HasField(Key))
+                {
+                    const FString BoneNameStr = BonesObject->GetStringField(Key);
+                    if (!BoneNameStr.IsEmpty())
+                    {
+                        BoneRef.BoneName = FName(*BoneNameStr);
+                    }
+                }
+            };
+
+            ReadBone(TEXT("left_clavicle"), LeftClavicle);
+            ReadBone(TEXT("left_upperarm"), LeftUpperArm);
+            ReadBone(TEXT("left_lowerarm"), LeftLowerArm);
+            ReadBone(TEXT("left_hand"), LeftHand);
+
+            ReadBone(TEXT("right_clavicle"), RightClavicle);
+            ReadBone(TEXT("right_upperarm"), RightUpperArm);
+            ReadBone(TEXT("right_lowerarm"), RightLowerArm);
+            ReadBone(TEXT("right_hand"), RightHand);
+
+            ReadBone(TEXT("left_thigh"), LeftThigh);
+            ReadBone(TEXT("left_calf"), LeftCalf);
+            ReadBone(TEXT("left_foot"), LeftFoot);
+
+            ReadBone(TEXT("right_thigh"), RightThigh);
+            ReadBone(TEXT("right_calf"), RightCalf);
+            ReadBone(TEXT("right_foot"), RightFoot);
+
+            ReadBone(TEXT("pelvis"), Pelvis);
+            ReadBone(TEXT("spine"), Spine);
+            ReadBone(TEXT("chest"), Chest);
+            ReadBone(TEXT("up_chest"), UpChest);
+            ReadBone(TEXT("neck"), Neck);
+            ReadBone(TEXT("head"), Head);
+        }
+    }
+
+    if (RootObject->HasField(TEXT("alpha")))
+    {
+        Alpha = RootObject->GetNumberField(TEXT("alpha"));
+    }
+
+    return true;
+}
+
 void FAnimNode_RebocapA2T::Initialize_AnyThread(const FAnimationInitializeContext& Context)
 {
     DECLARE_SCOPE_HIERARCHICAL_COUNTER_ANIMNODE(Initialize_AnyThread);

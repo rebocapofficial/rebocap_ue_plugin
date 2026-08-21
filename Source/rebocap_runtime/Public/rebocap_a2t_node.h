@@ -37,7 +37,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     // ==========================================
 
     /** Preset Template */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (PinHiddenByDefault, DisplayName = "Preset Template", ToolTip = "快捷预设模板。 / Preset Template."))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Control", meta = (PinHiddenByDefault, DisplayName = "Select Preset Template", ToolTip = "快捷预设模板。 / Preset Template."))
     ERebocapA2TPreset PresetTemplate;
 
     /** Symmetrical Edit (Mirror left changes to right) */
@@ -59,184 +59,190 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     /** Apply preset angles */
     void ApplyPreset(ERebocapA2TPreset InPreset);
 
+    /** Export A2T calibration to JSON string */
+    FString ToJsonString() const;
+
+    /** Import A2T calibration from JSON string */
+    bool FromJsonString(const FString& InJsonString);
+
     // ==========================================
     // --- 1. Left Arm ---
     // ==========================================
 
-    /** Left Clavicle Bone */
-    UPROPERTY(EditAnywhere, Category = "1. Left Arm", meta = (DisplayName = "Left Clavicle Bone"))
+    /** Left Collar / Clavicle Bone */
+    UPROPERTY(EditAnywhere, Category = "1. Left Arm", meta = (DisplayName = "Left Collar / Clavicle Bone"))
     FBoneReference LeftClavicle;
 
-    /** Left Clavicle Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "1. Left Arm", meta = (PinHiddenByDefault, DisplayName = "Left Clavicle Offset", ToolTip = "Left clavicle rotation offset in local space. / 左锁骨局部旋转偏移。"))
+    /** Left Collar / Clavicle Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "1. Left Arm", meta = (PinHiddenByDefault, DisplayName = "Left Collar / Clavicle Offset", ToolTip = "Left collar / clavicle rotation offset in local space. / 左锁骨局部旋转偏移。"))
     FRotator LeftClavicleOffset;
 
-    /** Left UpperArm Bone */
-    UPROPERTY(EditAnywhere, Category = "1. Left Arm", meta = (DisplayName = "Left UpperArm Bone"))
+    /** Left Shoulder / UpperArm Bone */
+    UPROPERTY(EditAnywhere, Category = "1. Left Arm", meta = (DisplayName = "Left Shoulder / UpperArm Bone"))
     FBoneReference LeftUpperArm;
 
-    /** Left UpperArm Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "1. Left Arm", meta = (PinHiddenByDefault, DisplayName = "Left UpperArm Offset", ToolTip = "Left upperarm rotation offset in local space. / 左大臂局部旋转偏移。"))
+    /** Left Shoulder / UpperArm Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "1. Left Arm", meta = (PinHiddenByDefault, DisplayName = "Left Shoulder / UpperArm Offset", ToolTip = "Left shoulder / upperarm rotation offset in local space. / 左大臂局部旋转偏移。"))
     FRotator LeftUpperArmOffset;
 
-    /** Left LowerArm Bone */
-    UPROPERTY(EditAnywhere, Category = "1. Left Arm", meta = (DisplayName = "Left LowerArm Bone"))
+    /** Left Elbow / LowerArm Bone */
+    UPROPERTY(EditAnywhere, Category = "1. Left Arm", meta = (DisplayName = "Left Elbow / LowerArm Bone"))
     FBoneReference LeftLowerArm;
 
-    /** Left LowerArm Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "1. Left Arm", meta = (PinHiddenByDefault, DisplayName = "Left LowerArm Offset", ToolTip = "Left lowerarm rotation offset in local space. / 左小臂局部旋转偏移。"))
+    /** Left Elbow / LowerArm Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "1. Left Arm", meta = (PinHiddenByDefault, DisplayName = "Left Elbow / LowerArm Offset", ToolTip = "Left elbow / lowerarm rotation offset in local space. / 左小臂局部旋转偏移。"))
     FRotator LeftLowerArmOffset;
 
-    /** Left Hand Bone */
-    UPROPERTY(EditAnywhere, Category = "1. Left Arm", meta = (DisplayName = "Left Hand Bone"))
+    /** Left Wrist / Hand Bone */
+    UPROPERTY(EditAnywhere, Category = "1. Left Arm", meta = (DisplayName = "Left Wrist / Hand Bone"))
     FBoneReference LeftHand;
 
-    /** Left Hand Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "1. Left Arm", meta = (PinHiddenByDefault, DisplayName = "Left Hand Offset", ToolTip = "Left hand rotation offset in local space. / 左手局部旋转偏移。"))
+    /** Left Wrist / Hand Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "1. Left Arm", meta = (PinHiddenByDefault, DisplayName = "Left Wrist / Hand Offset", ToolTip = "Left wrist / hand rotation offset in local space. / 左手局部旋转偏移。"))
     FRotator LeftHandOffset;
 
     // ==========================================
     // --- 2. Right Arm ---
     // ==========================================
 
-    /** Right Clavicle Bone */
-    UPROPERTY(EditAnywhere, Category = "2. Right Arm", meta = (DisplayName = "Right Clavicle Bone"))
+    /** Right Collar / Clavicle Bone */
+    UPROPERTY(EditAnywhere, Category = "2. Right Arm", meta = (DisplayName = "Right Collar / Clavicle Bone"))
     FBoneReference RightClavicle;
 
-    /** Right Clavicle Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right Clavicle Offset", ToolTip = "Right clavicle rotation offset in local space. / 右锁骨局部旋转偏移。"))
+    /** Right Collar / Clavicle Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right Collar / Clavicle Offset", ToolTip = "Right collar / clavicle rotation offset in local space. / 右锁骨局部旋转偏移。"))
     FRotator RightClavicleOffset;
 
-    /** Right UpperArm Bone */
-    UPROPERTY(EditAnywhere, Category = "2. Right Arm", meta = (DisplayName = "Right UpperArm Bone"))
+    /** Right Shoulder / UpperArm Bone */
+    UPROPERTY(EditAnywhere, Category = "2. Right Arm", meta = (DisplayName = "Right Shoulder / UpperArm Bone"))
     FBoneReference RightUpperArm;
 
-    /** Right UpperArm Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right UpperArm Offset", ToolTip = "Right upperarm rotation offset in local space. / 右大臂局部旋转偏移。"))
+    /** Right Shoulder / UpperArm Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right Shoulder / UpperArm Offset", ToolTip = "Right shoulder / upperarm rotation offset in local space. / 右大臂局部旋转偏移。"))
     FRotator RightUpperArmOffset;
 
-    /** Right LowerArm Bone */
-    UPROPERTY(EditAnywhere, Category = "2. Right Arm", meta = (DisplayName = "Right LowerArm Bone"))
+    /** Right Elbow / LowerArm Bone */
+    UPROPERTY(EditAnywhere, Category = "2. Right Arm", meta = (DisplayName = "Right Elbow / LowerArm Bone"))
     FBoneReference RightLowerArm;
 
-    /** Right LowerArm Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right LowerArm Offset", ToolTip = "Right lowerarm rotation offset in local space. / 右小臂局部旋转偏移。"))
+    /** Right Elbow / LowerArm Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right Elbow / LowerArm Offset", ToolTip = "Right elbow / lowerarm rotation offset in local space. / 右小臂局部旋转偏移。"))
     FRotator RightLowerArmOffset;
 
-    /** Right Hand Bone */
-    UPROPERTY(EditAnywhere, Category = "2. Right Arm", meta = (DisplayName = "Right Hand Bone"))
+    /** Right Wrist / Hand Bone */
+    UPROPERTY(EditAnywhere, Category = "2. Right Arm", meta = (DisplayName = "Right Wrist / Hand Bone"))
     FBoneReference RightHand;
 
-    /** Right Hand Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right Hand Offset", ToolTip = "Right hand rotation offset in local space. / 右手局部旋转偏移。"))
+    /** Right Wrist / Hand Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right Wrist / Hand Offset", ToolTip = "Right wrist / hand rotation offset in local space. / 右手局部旋转偏移。"))
     FRotator RightHandOffset;
 
     // ==========================================
     // --- 3. Left Leg ---
     // ==========================================
 
-    /** Left Thigh Bone */
-    UPROPERTY(EditAnywhere, Category = "3. Left Leg", meta = (DisplayName = "Left Thigh Bone"))
+    /** Left Hip / Thigh Bone */
+    UPROPERTY(EditAnywhere, Category = "3. Left Leg", meta = (DisplayName = "Left Hip / Thigh Bone"))
     FBoneReference LeftThigh;
 
-    /** Left Thigh Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "3. Left Leg", meta = (PinHiddenByDefault, DisplayName = "Left Thigh Offset", ToolTip = "Left thigh rotation offset in local space. / 左大腿局部旋转偏移。"))
+    /** Left Hip / Thigh Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "3. Left Leg", meta = (PinHiddenByDefault, DisplayName = "Left Hip / Thigh Offset", ToolTip = "Left hip / thigh rotation offset in local space. / 左大腿局部旋转偏移。"))
     FRotator LeftThighOffset;
 
-    /** Left Calf Bone */
-    UPROPERTY(EditAnywhere, Category = "3. Left Leg", meta = (DisplayName = "Left Calf Bone"))
+    /** Left Knee / Calf Bone */
+    UPROPERTY(EditAnywhere, Category = "3. Left Leg", meta = (DisplayName = "Left Knee / Calf Bone"))
     FBoneReference LeftCalf;
 
-    /** Left Calf Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "3. Left Leg", meta = (PinHiddenByDefault, DisplayName = "Left Calf Offset", ToolTip = "Left calf rotation offset in local space. / 左小腿局部旋转偏移。"))
+    /** Left Knee / Calf Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "3. Left Leg", meta = (PinHiddenByDefault, DisplayName = "Left Knee / Calf Offset", ToolTip = "Left knee / calf rotation offset in local space. / 左小腿局部旋转偏移。"))
     FRotator LeftCalfOffset;
 
-    /** Left Foot Bone */
-    UPROPERTY(EditAnywhere, Category = "3. Left Leg", meta = (DisplayName = "Left Foot Bone"))
+    /** Left Ankle / Foot Bone */
+    UPROPERTY(EditAnywhere, Category = "3. Left Leg", meta = (DisplayName = "Left Ankle / Foot Bone"))
     FBoneReference LeftFoot;
 
-    /** Left Foot Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "3. Left Leg", meta = (PinHiddenByDefault, DisplayName = "Left Foot Offset", ToolTip = "Left foot rotation offset in local space. / 左脚踝局部旋转偏移。"))
+    /** Left Ankle / Foot Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "3. Left Leg", meta = (PinHiddenByDefault, DisplayName = "Left Ankle / Foot Offset", ToolTip = "Left ankle / foot rotation offset in local space. / 左脚踝局部旋转偏移。"))
     FRotator LeftFootOffset;
 
     // ==========================================
     // --- 4. Right Leg ---
     // ==========================================
 
-    /** Right Thigh Bone */
-    UPROPERTY(EditAnywhere, Category = "4. Right Leg", meta = (DisplayName = "Right Thigh Bone"))
+    /** Right Hip / Thigh Bone */
+    UPROPERTY(EditAnywhere, Category = "4. Right Leg", meta = (DisplayName = "Right Hip / Thigh Bone"))
     FBoneReference RightThigh;
 
-    /** Right Thigh Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (PinHiddenByDefault, DisplayName = "Right Thigh Offset", ToolTip = "Right thigh rotation offset in local space. / 右大腿局部旋转偏移。"))
+    /** Right Hip / Thigh Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (PinHiddenByDefault, DisplayName = "Right Hip / Thigh Offset", ToolTip = "Right hip / thigh rotation offset in local space. / 右大腿局部旋转偏移。"))
     FRotator RightThighOffset;
 
-    /** Right Calf Bone */
-    UPROPERTY(EditAnywhere, Category = "4. Right Leg", meta = (DisplayName = "Right Calf Bone"))
+    /** Right Knee / Calf Bone */
+    UPROPERTY(EditAnywhere, Category = "4. Right Leg", meta = (DisplayName = "Right Knee / Calf Bone"))
     FBoneReference RightCalf;
 
-    /** Right Calf Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (PinHiddenByDefault, DisplayName = "Right Calf Offset", ToolTip = "Right calf rotation offset in local space. / 右小腿局部旋转偏移。"))
+    /** Right Knee / Calf Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (PinHiddenByDefault, DisplayName = "Right Knee / Calf Offset", ToolTip = "Right knee / calf rotation offset in local space. / 右小腿局部旋转偏移。"))
     FRotator RightCalfOffset;
 
-    /** Right Foot Bone */
-    UPROPERTY(EditAnywhere, Category = "4. Right Leg", meta = (DisplayName = "Right Foot Bone"))
+    /** Right Ankle / Foot Bone */
+    UPROPERTY(EditAnywhere, Category = "4. Right Leg", meta = (DisplayName = "Right Ankle / Foot Bone"))
     FBoneReference RightFoot;
 
-    /** Right Foot Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (PinHiddenByDefault, DisplayName = "Right Foot Offset", ToolTip = "Right foot rotation offset in local space. / 右脚踝局部旋转偏移。"))
+    /** Right Ankle / Foot Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (PinHiddenByDefault, DisplayName = "Right Ankle / Foot Offset", ToolTip = "Right ankle / foot rotation offset in local space. / 右脚踝局部旋转偏移。"))
     FRotator RightFootOffset;
 
     // ==========================================
-    // --- 5. Spine & Torso & Head ---
+    // --- 5. Root & Spine & Head ---
     // ==========================================
 
-    /** Pelvis Bone */
-    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Pelvis Bone"))
+    /** Pelvis / Hips Bone */
+    UPROPERTY(EditAnywhere, Category = "5. Root & Spine & Head", meta = (DisplayName = "Pelvis / Hips Bone"))
     FBoneReference Pelvis;
 
-    /** Pelvis Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Pelvis Offset", ToolTip = "Pelvis rotation offset in local space. / 骨盆/根骨骼局部旋转偏移。"))
+    /** Pelvis / Hips Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Root & Spine & Head", meta = (PinHiddenByDefault, DisplayName = "Pelvis / Hips Offset", ToolTip = "Pelvis / hips rotation offset in local space. / 骨盆/根骨骼局部旋转偏移。"))
     FRotator PelvisOffset;
 
-    /** Spine / Waist Bone */
-    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Spine / Waist Bone"))
+    /** Spine1 / Waist Bone */
+    UPROPERTY(EditAnywhere, Category = "5. Root & Spine & Head", meta = (DisplayName = "Spine1 / Waist Bone"))
     FBoneReference Spine;
 
-    /** Spine / Waist Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Spine / Waist Offset", ToolTip = "Spine/waist rotation offset in local space. / 腰椎/脊柱局部旋转偏移。"))
+    /** Spine1 / Waist Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Root & Spine & Head", meta = (PinHiddenByDefault, DisplayName = "Spine1 / Waist Offset", ToolTip = "Spine1 / waist rotation offset in local space. / 腰椎/脊柱局部旋转偏移。"))
     FRotator SpineOffset;
 
-    /** Chest Bone */
-    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Chest Bone"))
+    /** Spine2 / Chest Bone */
+    UPROPERTY(EditAnywhere, Category = "5. Root & Spine & Head", meta = (DisplayName = "Spine2 / Chest Bone"))
     FBoneReference Chest;
 
-    /** Chest Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Chest Offset", ToolTip = "Chest rotation offset in local space. / 胸腔局部旋转偏移。"))
+    /** Spine2 / Chest Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Root & Spine & Head", meta = (PinHiddenByDefault, DisplayName = "Spine2 / Chest Offset", ToolTip = "Spine2 / chest rotation offset in local space. / 胸腔局部旋转偏移。"))
     FRotator ChestOffset;
 
-    /** Up Chest Bone */
-    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Up Chest Bone"))
+    /** Spine3 / Up Chest Bone */
+    UPROPERTY(EditAnywhere, Category = "5. Root & Spine & Head", meta = (DisplayName = "Spine3 / Up Chest Bone"))
     FBoneReference UpChest;
 
-    /** Up Chest Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Up Chest Offset", ToolTip = "Up chest rotation offset in local space. / 上胸局部旋转偏移。"))
+    /** Spine3 / Up Chest Rotation Offset */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Root & Spine & Head", meta = (PinHiddenByDefault, DisplayName = "Spine3 / Up Chest Offset", ToolTip = "Spine3 / up chest rotation offset in local space. / 上胸局部旋转偏移。"))
     FRotator UpChestOffset;
 
     /** Neck Bone */
-    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Neck Bone"))
+    UPROPERTY(EditAnywhere, Category = "5. Root & Spine & Head", meta = (DisplayName = "Neck Bone"))
     FBoneReference Neck;
 
     /** Neck Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Neck Offset", ToolTip = "Neck rotation offset in local space. / 颈部/脖子局部旋转偏移。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Root & Spine & Head", meta = (PinHiddenByDefault, DisplayName = "Neck Offset", ToolTip = "Neck rotation offset in local space. / 颈部/脖子局部旋转偏移。"))
     FRotator NeckOffset;
 
     /** Head Bone */
-    UPROPERTY(EditAnywhere, Category = "5. Spine & Torso & Head", meta = (DisplayName = "Head Bone"))
+    UPROPERTY(EditAnywhere, Category = "5. Root & Spine & Head", meta = (DisplayName = "Head Bone"))
     FBoneReference Head;
 
     /** Head Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Spine & Torso & Head", meta = (PinHiddenByDefault, DisplayName = "Head Offset", ToolTip = "Head rotation offset in local space. / 头部局部旋转偏移。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "5. Root & Spine & Head", meta = (PinHiddenByDefault, DisplayName = "Head Offset", ToolTip = "Head rotation offset in local space. / 头部局部旋转偏移。"))
     FRotator HeadOffset;
 
     /** Alpha Weight */
