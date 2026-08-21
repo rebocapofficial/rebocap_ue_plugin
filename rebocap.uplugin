@@ -1,24 +1,25 @@
 {
 	"FileVersion": 3,
-	"Version": 20,
+	"Version": 13,
 	"VersionName": "V2.0-beta01",
-	"FriendlyName": "Rebocap - pure blueprint control",
-	"Description": "rebocap LiveLink plugin with runtime and editor modules,Neck_Akatsuki as a branch for updates and adding extra features",
+	"FriendlyName": "Rebocap - blueprint control",
+	"Description": "",
 	"Category": "Other",
-	"CreatedBy": "Neck_Akatsuki",
-	"CreatedByURL": "https://x.com/Todd_ike",
+	"CreatedBy": "Rebocap official",
+	"CreatedByURL": "http://doc.hamer.xin/docs/",
 	"DocsURL": "",
 	"MarketplaceURL": "",
 	"SupportURL": "",
 	"CanContainContent": true,
-	"IsBetaVersion": true,
+	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
 	"Installed": false,
 	"EnabledByDefault": true,
 	"LocalizationTargets": [
 		{
 			"Name": "rebocap",
-			"LoadingPolicy": "Always"
+			"LoadingPolicy": "Always",
+			"ConfigGenerationPolicy": "Never"
 		}
 	],
 	"Modules": [
