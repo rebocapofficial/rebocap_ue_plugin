@@ -4,24 +4,23 @@
 #include "LiveLinkRemapAsset.h"
 #include "rebocap_body_remap_asset.generated.h"
 
-/** 常用骨骼命名预设规范 */
+/** Bone Naming Preset Standards */
 UENUM(BlueprintType)
 enum class ERebocapBonePreset : uint8 {
-  Unreal_Engine UMETA(DisplayName = "Unreal Engine (UE4 / UE5 / MetaHuman 官方标准骨骼)"),
-  Mixamo UMETA(DisplayName = "Adobe Mixamo (无前缀: Hips, Spine...)"),
-  Mixamo_Prefix UMETA(DisplayName = "Adobe Mixamo (带前缀: mixamorig:Hips...)"),
-  MMD_Japanese UMETA(DisplayName = "MMD 经典日文骨骼 (センター, 上半身, 左腕...)"),
-  VRM_Humanoid UMETA(DisplayName = "VRM / VRoid / Unity Humanoid 骨骼规范"),
-  Rebocap_Standard UMETA(DisplayName = "Rebocap 24骨标准命名 (默认值)"),
-  Custom UMETA(DisplayName = "Custom (自定义模式)")
+  Unreal_Engine UMETA(DisplayName = "Unreal Engine (UE4 / UE5 / MetaHuman Standard)"),
+  Mixamo UMETA(DisplayName = "Adobe Mixamo (No Prefix: Hips, Spine...)"),
+  Mixamo_Prefix UMETA(DisplayName = "Adobe Mixamo (With Prefix: mixamorig:Hips...)"),
+  MMD_Japanese UMETA(DisplayName = "MMD Standard Japanese Bones (センター, 上半身, 左腕...)"),
+  VRM_Humanoid UMETA(DisplayName = "VRM / VRoid / Unity Humanoid Standard"),
+  Rebocap_Standard UMETA(DisplayName = "Rebocap 24 Bones Standard (Default)"),
+  Custom UMETA(DisplayName = "Custom")
 };
 
 /** 
- * Rebocap 骨骼映射基础资产
- * 用于将标准 Rebocap 24 骨节点映射到当前角色的对应骨骼名称。
- * 支持顶部下拉切换预设一键自动填词，并允许随时手动微调。
+ * Rebocap Bone Remapping Asset
+ * Maps standard Rebocap 24-bone motion capture nodes to the character's skeletal joint names.
  */
-UCLASS(BlueprintType, Blueprintable, meta = (ToolTip = "Rebocap 骨骼映射资产，用于将标准 Rebocap 24 骨节点映射到当前角色的对应骨骼名称。\n支持在面板顶部选择预设一键自动填词。"))
+UCLASS(BlueprintType, Blueprintable, meta = (ToolTip = "Rebocap bone mapping asset for retargeting mocap bones to character skeleton joint names. / Rebocap 骨骼映射资产。"))
 class REBOCAP_RUNTIME_API URebocapMapData : public ULiveLinkRemapAsset {
   GENERATED_BODY()
 
@@ -35,21 +34,19 @@ class REBOCAP_RUNTIME_API URebocapMapData : public ULiveLinkRemapAsset {
   UFUNCTION(BlueprintCallable, Category = "BoneRemapping")
   void InitializeTMap();
 
-  /** 
-   * 快捷预设选择：切换预设将自动将下方所有输入框覆盖为对应的骨骼名称。
-   */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. 快捷骨骼预设 (Preset Template)", meta = (DisplayName = "选择骨骼预设 (Select Preset)", ToolTip = "选择预设将自动将下方所有输入框覆盖为对应的骨骼名称。填充后可继续手动微调。"))
+  /** Preset Template */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "0. Presets & Actions", meta = (DisplayName = "Select Bone Preset", ToolTip = "Select a bone preset to automatically populate all joint names below. / 选择骨骼预设，自动填充下方骨骼名称。"))
   ERebocapBonePreset PresetTemplate = ERebocapBonePreset::Unreal_Engine;
 
-  /** 应用指定骨骼预设 */
+  /** Apply Bone Preset */
   UFUNCTION(BlueprintCallable, Category = "BoneRemapping")
   void ApplyPreset(ERebocapBonePreset InPreset);
 
-  /** 导出当前骨骼配置与脚底碰撞体顶点为 JSON 文件（完全兼容 Blender 插件格式） */
+  /** Export to JSON */
   UFUNCTION(BlueprintCallable, Category = "BoneRemapping")
   void ExportToJson();
 
-  /** 从 JSON 文件导入骨骼配置与脚底碰撞体顶点（完全兼容 Blender 插件格式） */
+  /** Import from JSON */
   UFUNCTION(BlueprintCallable, Category = "BoneRemapping")
   void ImportFromJson();
 
@@ -57,92 +54,92 @@ class REBOCAP_RUNTIME_API URebocapMapData : public ULiveLinkRemapAsset {
   virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
-  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "0. 映射表预览 (Mapping Preview)")
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "0. Mapping Preview", meta = (DisplayName = "Name Mapping"))
   TMap<FName, FName> name_mapping_;
 
-  // --- 1. 躯干与头部 (Root & Spine & Head) ---
+  // --- 1. Root & Spine & Head ---
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Pelvis / Hips (盆骨/根骨骼)", ToolTip = "动捕根骨骼。\n· 同时接收rebocap移动的坐标。"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. Root & Spine & Head", meta = (DisplayName = "Pelvis / Hips", ToolTip = "Root mocap bone, receives root motion translation. / 动捕根骨骼，接收根位移。"))
   FName rebocap_pelvis_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Spine1 / Spine (腰椎)", ToolTip = "通常对应肚脐这个关节。"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. Root & Spine & Head", meta = (DisplayName = "Spine1 / Waist", ToolTip = "Waist / Lower spine joint. / 腰椎骨骼。"))
   FName spine1_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Spine2 / Chest (胸腔)", ToolTip = "对应胃部的关节（胸腔三角凹槽处）\n· 控制整个胸腔的摆动"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. Root & Spine & Head", meta = (DisplayName = "Spine2 / Chest", ToolTip = "Chest joint for mid-torso bend. / 胸腔骨骼。"))
   FName spine2_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Spine3 / Up Chest (上胸)", ToolTip = "对应胸部/乳房的关节\n· 对于没有该关节的角色，该选项留空。"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. Root & Spine & Head", meta = (DisplayName = "Spine3 / Up Chest", ToolTip = "Upper chest joint (leave empty if skeleton has no spine3). / 上胸骨骼。"))
   FName spine3_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Neck / Neck_01 (脖子/颈部)", ToolTip = "脖子"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. Root & Spine & Head", meta = (DisplayName = "Neck", ToolTip = "Neck joint. / 脖子/颈部。"))
   FName neck_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. 躯干与头部 (Root & Spine & Head)", meta = (DisplayName = "Head (头部)", ToolTip = "头部"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "1. Root & Spine & Head", meta = (DisplayName = "Head", ToolTip = "Head joint. / 头部骨骼。"))
   FName head_;
 
-  // --- 2. 左上肢 (Left Arm) ---
+  // --- 2. Left Arm ---
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Collar / Shoulder (左锁骨/肩膀)", ToolTip = "对应背书包的肩膀骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. Left Arm", meta = (DisplayName = "Left Collar / Clavicle", ToolTip = "Left shoulder / clavicle joint. / 左锁骨/肩膀骨骼。"))
   FName l_collar_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Shoulder / UpperArm (左大臂/上臂)", ToolTip = "对应戴上臂追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. Left Arm", meta = (DisplayName = "Left Shoulder / UpperArm", ToolTip = "Left upper arm joint. / 左大臂骨骼。"))
   FName l_shoulder_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Elbow / LowerArm (左小臂/前臂)", ToolTip = "对应戴下臂追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. Left Arm", meta = (DisplayName = "Left Elbow / LowerArm", ToolTip = "Left forearm / lower arm joint. / 左小臂骨骼。"))
   FName l_elbow_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Wrist / Hand (左手腕/手掌)", ToolTip = "对应戴手追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. Left Arm", meta = (DisplayName = "Left Wrist / Hand", ToolTip = "Left wrist / hand joint. / 左手腕/手掌骨骼。"))
   FName l_wrist_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. 左上肢 (Left Arm)", meta = (DisplayName = "Left Hand End / Fingers (左手指/末端)", ToolTip = "留空，暂无内容"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "2. Left Arm", meta = (DisplayName = "Left Hand End / Fingers", ToolTip = "Left hand end / fingers joint (optional). / 左手指/末端。"))
   FName l_hand_;
 
-  // --- 3. 右上肢 (Right Arm) ---
+  // --- 3. Right Arm ---
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Collar / Shoulder (右锁骨/肩膀)", ToolTip = "对应背书包的肩膀骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. Right Arm", meta = (DisplayName = "Right Collar / Clavicle", ToolTip = "Right shoulder / clavicle joint. / 右锁骨/肩膀骨骼。"))
   FName r_collar_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Shoulder / UpperArm (右大臂/上臂)", ToolTip = "对应戴上臂追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. Right Arm", meta = (DisplayName = "Right Shoulder / UpperArm", ToolTip = "Right upper arm joint. / 右大臂骨骼。"))
   FName r_shoulder_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Elbow / LowerArm (右小臂/前臂)", ToolTip = "对应戴下臂追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. Right Arm", meta = (DisplayName = "Right Elbow / LowerArm", ToolTip = "Right forearm / lower arm joint. / 右小臂骨骼。"))
   FName r_elbow_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Wrist / Hand (右手腕/手掌)", ToolTip = "对应戴手追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. Right Arm", meta = (DisplayName = "Right Wrist / Hand", ToolTip = "Right wrist / hand joint. / 右手腕/手掌骨骼。"))
   FName r_wrist_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. 右上肢 (Right Arm)", meta = (DisplayName = "Right Hand End / Fingers (右手指/末端)", ToolTip = "留空，暂无内容"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "3. Right Arm", meta = (DisplayName = "Right Hand End / Fingers", ToolTip = "Right hand end / fingers joint (optional). / 右手指/末端。"))
   FName r_hand_;
 
-  // --- 4. 左下肢 (Left Leg) ---
+  // --- 4. Left Leg ---
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Hip / Thigh / UpperLeg (左大腿)", ToolTip = "对应戴大腿追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. Left Leg", meta = (DisplayName = "Left Hip / Thigh", ToolTip = "Left thigh / upper leg joint. / 左大腿骨骼。"))
   FName l_hip_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Knee / Calf / LowerLeg (左小腿)", ToolTip = "对应戴小腿追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. Left Leg", meta = (DisplayName = "Left Knee / Calf", ToolTip = "Left knee / lower leg joint. / 左小腿骨骼。"))
   FName l_knee_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Ankle / Foot (左脚踝/脚部)", ToolTip = "对应戴脚追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. Left Leg", meta = (DisplayName = "Left Ankle / Foot", ToolTip = "Left ankle / foot joint. / 左脚踝骨骼。"))
   FName l_ankle_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. 左下肢 (Left Leg)", meta = (DisplayName = "Left Foot End / Toe (左脚趾/脚掌球)", ToolTip = "留空，暂无内容"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "4. Left Leg", meta = (DisplayName = "Left Foot End / Toe", ToolTip = "Left toe joint (optional). / 左脚趾。"))
   FName l_foot_;
 
-  // --- 5. 右下肢 (Right Leg) ---
+  // --- 5. Right Leg ---
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Hip / Thigh / UpperLeg (右大腿)", ToolTip = "对应戴大腿追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. Right Leg", meta = (DisplayName = "Right Hip / Thigh", ToolTip = "Right thigh / upper leg joint. / 右大腿骨骼。"))
   FName r_hip_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Knee / Calf / LowerLeg (右小腿)", ToolTip = "对应戴小腿追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. Right Leg", meta = (DisplayName = "Right Knee / Calf", ToolTip = "Right knee / lower leg joint. / 右小腿骨骼。"))
   FName r_knee_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Ankle / Foot (右脚踝/脚部)", ToolTip = "对应戴脚追踪器的骨骼"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. Right Leg", meta = (DisplayName = "Right Ankle / Foot", ToolTip = "Right ankle / foot joint. / 右脚踝骨骼。"))
   FName r_ankle_;
 
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. 右下肢 (Right Leg)", meta = (DisplayName = "Right Foot End / Toe (右脚趾/脚掌球)", ToolTip = "留空，暂无内容"))
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "5. Right Leg", meta = (DisplayName = "Right Foot End / Toe", ToolTip = "Right toe joint (optional). / 右脚趾。"))
   FName r_foot_;
 
-  // --- 6. 脚底贴地碰撞体顶点 (Foot Sole Indices - 内存存储用于兼容 Blender JSON，不显示在 UE 面板) ---
+  // --- 6. Foot Sole Collision Indices ---
   UPROPERTY()
   TArray<int32> FootIndices;
 };

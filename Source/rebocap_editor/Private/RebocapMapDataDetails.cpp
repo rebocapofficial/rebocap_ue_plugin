@@ -7,19 +7,21 @@
 #include "Widgets/Layout/SBox.h"
 #include "rebocap_body_remap_asset.h"
 
+#define LOCTEXT_NAMESPACE "RebocapMapDataDetails"
+
 void FRebocapMapDataDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
 {
     TArray<TWeakObjectPtr<UObject>> ObjectsBeingCustomized;
     DetailBuilder.GetObjectsBeingCustomized(ObjectsBeingCustomized);
 
     IDetailCategoryBuilder& PresetCategory = DetailBuilder.EditCategory(
-        "0. 快捷骨骼预设 (Preset Template)",
-        FText::FromString(TEXT("0. 快捷骨骼预设 (Preset Template)")),
+        "0. Presets & Actions",
+        LOCTEXT("PresetCategoryName", "0. Presets & Actions"),
         ECategoryPriority::Important
     );
 
     // 添加操作按钮行：导出 JSON、导入 JSON
-    PresetCategory.AddCustomRow(FText::FromString(TEXT("PresetActions")))
+    PresetCategory.AddCustomRow(LOCTEXT("PresetActionsFilter", "Preset Actions Export Import JSON"))
     .WholeRowContent()
     [
         SNew(SHorizontalBox)
@@ -30,7 +32,7 @@ void FRebocapMapDataDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilde
             SNew(SButton)
             .ButtonStyle(FAppStyle::Get(), "Button")
             .ContentPadding(FMargin(10.0f, 4.0f))
-            .ToolTipText(FText::FromString(TEXT("将当前 24 根骨骼名称及 12 个脚底顶点导出为 JSON 文件（完全兼容 Blender 插件格式）。")))
+            .ToolTipText(LOCTEXT("ExportJsonTooltip", "Export current 24 bone names and foot vertices to JSON (fully compatible with Blender plugin format). / 导出当前骨骼配置为 JSON 文件。"))
             .OnClicked_Lambda([ObjectsBeingCustomized]() -> FReply {
                 for (auto& WeakObj : ObjectsBeingCustomized)
                 {
@@ -44,7 +46,7 @@ void FRebocapMapDataDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilde
             })
             [
                 SNew(STextBlock)
-                .Text(FText::FromString(TEXT("📤 导出为 JSON")))
+                .Text(LOCTEXT("ExportJsonButton", "📤 Export to JSON"))
                 .Font(FAppStyle::GetFontStyle(TEXT("NormalFontBold")))
             ]
         ]
@@ -55,7 +57,7 @@ void FRebocapMapDataDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilde
             SNew(SButton)
             .ButtonStyle(FAppStyle::Get(), "Button")
             .ContentPadding(FMargin(10.0f, 4.0f))
-            .ToolTipText(FText::FromString(TEXT("选择并导入 JSON 配置文件，自动填充骨骼名称及脚底顶点（完全兼容 Blender 插件格式）。")))
+            .ToolTipText(LOCTEXT("ImportJsonTooltip", "Select and import JSON configuration to auto-fill bone names and foot vertices (fully compatible with Blender plugin format). / 从 JSON 文件导入骨骼配置。"))
             .OnClicked_Lambda([ObjectsBeingCustomized, &DetailBuilder]() -> FReply {
                 for (auto& WeakObj : ObjectsBeingCustomized)
                 {
@@ -70,9 +72,11 @@ void FRebocapMapDataDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilde
             })
             [
                 SNew(STextBlock)
-                .Text(FText::FromString(TEXT("📥 从 JSON 导入")))
+                .Text(LOCTEXT("ImportJsonButton", "📥 Import from JSON"))
                 .Font(FAppStyle::GetFontStyle(TEXT("NormalFontBold")))
             ]
         ]
     ];
 }
+
+#undef LOCTEXT_NAMESPACE

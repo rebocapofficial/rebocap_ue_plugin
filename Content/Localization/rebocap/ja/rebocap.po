@@ -57,3 +57,23 @@ msgstr "Rebocap ソース"
 #: [RebocapSourceFactory]SourceTooltip
 msgid "Creates a connection to a Rebocap Source"
 msgstr "Rebocap ソースへの接続を作成します"
+
+#: [RebocapMapDataDetails]PresetCategoryName
+msgid "0. Presets & Actions"
+msgstr "0. プリセットと操作 (Presets & Actions)"
+
+#: [RebocapMapDataDetails]ExportJsonButton
+msgid "📤 Export to JSON"
+msgstr "📤 JSONへエクスポート"
+
+#: [RebocapMapDataDetails]ExportJsonTooltip
+msgid "Export current 24 bone names and foot vertices to JSON (fully compatible with Blender plugin format). / 导出当前骨骼配置为 JSON 文件。"
+msgstr "現在の24本のボーン名と足底頂点をJSONファイルにエクスポートします（Blenderプラグイン形式と完全互換）。"
+
+#: [RebocapMapDataDetails]ImportJsonButton
+msgid "📥 Import from JSON"
+msgstr "📥 JSONからインポート"
+
+#: [RebocapMapDataDetails]ImportJsonTooltip
+msgid "Select and import JSON configuration to auto-fill bone names and foot vertices (fully compatible with Blender plugin format). / 从 JSON 文件导入骨骼配置。"
+msgstr "JSON設定ファイルを選択してインポートし、ボーン名と足底頂点を自動入力します（Blenderプラグイン形式と完全互換）。"

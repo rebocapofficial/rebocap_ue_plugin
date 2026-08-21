@@ -91,12 +91,12 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalCon
    * 不想反复被数据刷屏或已经制作有固定的骨架文件后可以关闭该功能；
    * 建议创建功能引脚去手动控制。（默认开启）
    */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName="Auto submit skeleton data", ToolTip = "是否自动把当前角色的T-Pose骨骼数据发回到rebocap里，\n不想反复被数据刷屏或已经制作有固定的骨架文件后可以关闭该功能；\n建议创建功能引脚去手动控制。（默认开启）"))
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName="Auto submit skeleton data", ToolTip = "Automatically submit character T-Pose skeleton data back to Rebocap. / 是否自动把当前角色的T-Pose骨骼数据发回到rebocap里。"))
   bool bAutoSkeleton = true;
 
   // 2. 是否自动连接 (默认开启)
   /** 控制是否连接Rebocap。（默认开启） */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName = "Connect Rebocap", ToolTip = "控制是否连接Rebocap。（默认开启）"))
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName = "Connect Rebocap", ToolTip = "Controls whether to automatically connect to Rebocap mocap service. / 控制是否连接Rebocap。（默认开启）"))
   bool bAutoConnect = true;
 
   // 3. 丢包防闪保护 (默认开启)
@@ -114,7 +114,7 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalCon
   ULiveLinkRemapAsset* current_retarget_asset_ = nullptr;
 
   /** 填写骨骼映射/骨骼重定向对应名字映射表。 */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, NoClear, Category = Retarget, meta = (PinShownByDefault, ToolTip = "填写骨骼映射/骨骼重定向对应名字映射表。"))
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, NoClear, Category = Retarget, meta = (PinShownByDefault, DisplayName = "Retarget Asset", ToolTip = "Bone mapping and retarget asset for character skeletal binding. / 填写骨骼映射/骨骼重定向对应名字映射表。"))
   TSubclassOf<URebocapMapData> retarget_asset_;
 
   virtual void OnInitializeAnimInstance(const FAnimInstanceProxy* InProxy, const UAnimInstance* InAnimInstance) override;

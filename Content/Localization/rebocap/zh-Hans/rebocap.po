@@ -57,3 +57,23 @@ msgstr "Rebocap 动捕数据源"
 #: [RebocapSourceFactory]SourceTooltip
 msgid "Creates a connection to a Rebocap Source"
 msgstr "创建到 Rebocap 动捕服务的连接"
+
+#: [RebocapMapDataDetails]PresetCategoryName
+msgid "0. Presets & Actions"
+msgstr "0. 快捷骨骼预设与操作 (Presets & Actions)"
+
+#: [RebocapMapDataDetails]ExportJsonButton
+msgid "📤 Export to JSON"
+msgstr "📤 导出为 JSON"
+
+#: [RebocapMapDataDetails]ExportJsonTooltip
+msgid "Export current 24 bone names and foot vertices to JSON (fully compatible with Blender plugin format). / 导出当前骨骼配置为 JSON 文件。"
+msgstr "将当前 24 根骨骼名称及 12 个脚底顶点导出为 JSON 文件（完全兼容 Blender 插件格式）。"
+
+#: [RebocapMapDataDetails]ImportJsonButton
+msgid "📥 Import from JSON"
+msgstr "📥 从 JSON 导入"
+
+#: [RebocapMapDataDetails]ImportJsonTooltip
+msgid "Select and import JSON configuration to auto-fill bone names and foot vertices (fully compatible with Blender plugin format). / 从 JSON 文件导入骨骼配置。"
+msgstr "选择并导入 JSON 配置文件，自动填充骨骼名称及脚底顶点（完全兼容 Blender 插件格式）。"
