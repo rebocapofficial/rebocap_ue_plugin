@@ -1,4 +1,4 @@
-﻿#include "RebocapLivelinkBluePrintManager.h"
+#include "RebocapLivelinkBluePrintManager.h"
 
 #include "rebocap_source.h"
 #include "Features/IModularFeatures.h"
@@ -8,10 +8,9 @@
 bool URebocapLivelinkBluePrintManager::bIsConnected = false;
 
 void URebocapLivelinkBluePrintManager::ConnectToRebocapLivelinkSource(int Port) {
-  // Note: It's better for you to control livelink on your own ui system
   bIsConnected = true;
   if (!FRebocapSource::GetInstance().IsValid()) {
-    UE_LOG(LogTemp, Display, TEXT("start create rebocap live link!!!!"));
+    UE_LOG(LogTemp, Display, TEXT("[Rebocap] Starting and creating Rebocap LiveLink source on port: %d"), Port);
     // 创建新的 LiveLink Source
     TSharedPtr<FRebocapSource> NewSource = MakeShared<FRebocapSource>(static_cast<uint16_t>(Port));
 
@@ -33,9 +32,16 @@ void URebocapLivelinkBluePrintManager::ConnectToRebocapLivelinkSource(int Port) 
 
 void URebocapLivelinkBluePrintManager::DisconnectToRebocapLivelinkSource() {
   bIsConnected = false;
-  UE_LOG(LogTemp, Display, TEXT("DisconnectLiveLink!!!!"));
+  UE_LOG(LogTemp, Display, TEXT("[Rebocap] Disconnecting Rebocap LiveLink source..."));
   if (FRebocapSource::GetInstance().IsValid()) {
-    UE_LOG(LogTemp, Display, TEXT("start clear rebocap live link!!!!"));
     FRebocapSource::GetInstance()->ManualStop();
   }
+}
+
+bool URebocapLivelinkBluePrintManager::IsConnectedToRebocap() {
+  auto Source = FRebocapSource::GetInstance();
+  if (Source.IsValid()) {
+    return Source->IsPortOpen();
+  }
+  return false;
 }

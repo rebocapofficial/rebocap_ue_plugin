@@ -29,6 +29,7 @@ public class rebocap_runtime : ModuleRules
         {
             // 库文件路径
             string LibPath = Path.Combine(PluginDirectory, "Binaries", "ThirdParty", "RebocapWsSdk", "Win64");
+            string DllPath = Path.Combine(LibPath, "rebocap_ws_sdk.dll");
             
             // 链接 .lib
             PublicAdditionalLibraries.Add(Path.Combine(PluginDirectory, "x64", "Release", "rebocap_ws_sdk.lib"));
@@ -36,8 +37,10 @@ public class rebocap_runtime : ModuleRules
             // 延迟加载 .dll
             PublicDelayLoadDLLs.Add("rebocap_ws_sdk.dll");
 
-            // 确保打包时 .dll 会被拷贝过去
-            RuntimeDependencies.Add(Path.Combine(LibPath, "rebocap_ws_sdk.dll"));
+            // 确保在任何打包配置（Development 或 Shipping）下，.dll 都会被完整拷贝到最终发布的独立游戏目录中
+            RuntimeDependencies.Add(DllPath, StagedFileType.NonUFS);
+            RuntimeDependencies.Add("$(TargetOutputDir)/rebocap_ws_sdk.dll", DllPath, StagedFileType.NonUFS);
+            RuntimeDependencies.Add("$(BinaryOutputDir)/rebocap_ws_sdk.dll", DllPath, StagedFileType.NonUFS);
         }
 
         // 4. 公共模块依赖

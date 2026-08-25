@@ -21,6 +21,18 @@ void Frebocap_runtimeModule::StartupModule()
     FString LibraryPath;
 #if PLATFORM_WINDOWS
     TArray<FString> CandidatePaths;
+
+    // 1. 独立运行的游戏主程序目录（支持 Development 与 Shipping 打包环境）
+    FString AppBaseDir = FPlatformProcess::BaseDir();
+    if (!AppBaseDir.IsEmpty())
+    {
+        CandidatePaths.Add(FPaths::Combine(*AppBaseDir, TEXT("rebocap_ws_sdk.dll")));
+        CandidatePaths.Add(FPaths::Combine(*AppBaseDir, TEXT("rebocap/Binaries/ThirdParty/RebocapWsSdk/Win64/rebocap_ws_sdk.dll")));
+        CandidatePaths.Add(FPaths::Combine(*AppBaseDir, TEXT("../Plugins/rebocap/Binaries/ThirdParty/RebocapWsSdk/Win64/rebocap_ws_sdk.dll")));
+        CandidatePaths.Add(FPaths::Combine(*AppBaseDir, TEXT("../../Plugins/rebocap/Binaries/ThirdParty/RebocapWsSdk/Win64/rebocap_ws_sdk.dll")));
+    }
+
+    // 2. 插件安装基准目录（编辑器与开发工程）
     if (!BaseDir.IsEmpty())
     {
         CandidatePaths.Add(FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/RebocapWsSdk/Win64/rebocap_ws_sdk.dll")));
@@ -28,8 +40,11 @@ void Frebocap_runtimeModule::StartupModule()
         CandidatePaths.Add(FPaths::Combine(*BaseDir, TEXT("Binaries/Win64/rebocap_ws_sdk.dll")));
         CandidatePaths.Add(FPaths::Combine(*BaseDir, TEXT("rebocap_ws_sdk.dll")));
     }
+
+    // 3. 项目与引擎插件标准目录
     CandidatePaths.Add(FPaths::Combine(FPaths::ProjectPluginsDir(), TEXT("rebocap/Binaries/ThirdParty/RebocapWsSdk/Win64/rebocap_ws_sdk.dll")));
     CandidatePaths.Add(FPaths::Combine(FPaths::ProjectPluginsDir(), TEXT("rebocap/x64/Release/rebocap_ws_sdk.dll")));
+    CandidatePaths.Add(FPaths::Combine(FPaths::ProjectDir(), TEXT("Binaries/Win64/rebocap_ws_sdk.dll")));
     CandidatePaths.Add(FPaths::Combine(FPaths::EnginePluginsDir(), TEXT("Marketplace/rebocap/Binaries/ThirdParty/RebocapWsSdk/Win64/rebocap_ws_sdk.dll")));
 
     for (const FString& Path : CandidatePaths)
