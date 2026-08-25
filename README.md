@@ -1,4 +1,4 @@
-# Rebocap Unreal Engine Plugin (rebocap-ue-plugin)
+# Rebocap Unreal Engine Plugin (rebocap_ue_plugin)
 
 <div align="center">
 
@@ -8,7 +8,7 @@
 **官方 Rebocap 虚幻引擎 LiveLink 动捕插件（支持 UE 4.26 至 UE 5.8 全版本）**
 
 [![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-4.26%20~%205.8-blue.svg?logo=unrealengine)](https://www.unrealengine.com/)
-[![Release Version](https://img.shields.io/badge/Release-V2.0--beta07-brightgreen.svg)](https://github.com/rebocapofficial/rebocap-ue-plugin/releases)
+[![Release Version](https://img.shields.io/badge/Release-V2.0--beta07-brightgreen.svg)](https://github.com/rebocapofficial/rebocap_ue_plugin/releases)
 [![License](https://img.shields.io/badge/License-MIT-orange.svg)](LICENSE)
 [![Doc](https://img.shields.io/badge/Documentation-doc.hamer.xin-blueviolet)](http://doc.hamer.xin/)
 
@@ -20,7 +20,7 @@
 
 ## 📖 中文说明
 
-**`rebocap-ue-plugin`** 是 Rebocap 动捕系统官方专为 **Epic Games Unreal Engine** 开发的高性能动捕插件。插件基于原生 WebSocket 通信协议与虚幻引擎 **LiveLink** 架构，实现零延迟、高精度的全身动作捕捉数据实时推流、骨骼自适应重定向与动画驱动。
+**`rebocap_ue_plugin`** 是 Rebocap 动捕系统官方专为 **Epic Games Unreal Engine** 开发的高性能动捕插件。插件基于原生 WebSocket 通信协议与虚幻引擎 **LiveLink** 架构，实现零延迟、高精度的全身动作捕捉数据实时推流、骨骼自适应重定向与动画驱动。
 
 ### ✨ 核心特性
 
@@ -36,7 +36,7 @@
 ### 📦 快速安装与使用
 
 #### 1. 安装插件
-1. 从 [Releases](https://github.com/rebocapofficial/rebocap-ue-plugin/releases) 下载对应虚幻引擎版本的预编译包（或直接下载源码）；
+1. 从 [Releases](https://github.com/rebocapofficial/rebocap_ue_plugin/releases) 下载对应虚幻引擎版本的预编译包（或直接下载源码）；
 2. 解压到你的虚幻工程根目录下的 `Plugins/rebocap`（如无 `Plugins` 文件夹可手动新建）；
 3. 打开工程，在 **编辑 -> 插件 (Plugins)** 中勾选并启用 **Rebocap** 插件（需同时启用 LiveLink）。
 
@@ -61,7 +61,7 @@
 
 ## 🌐 English
 
-**`rebocap-ue-plugin`** is the official Unreal Engine motion capture plugin for **Rebocap**. Powered by Rebocap's WebSocket protocol and Unreal Engine's **LiveLink** framework, it provides ultra-low latency, high-precision real-time body tracking, bone retargeting, and animation driving.
+**`rebocap_ue_plugin`** is the official Unreal Engine motion capture plugin for **Rebocap**. Powered by Rebocap's WebSocket protocol and Unreal Engine's **LiveLink** framework, it provides ultra-low latency, high-precision real-time body tracking, bone retargeting, and animation driving.
 
 ### ✨ Key Features
 
@@ -78,4 +78,4 @@
 
 - **License**: Released under the [MIT License](LICENSE).
 - **Official Documentation**: [http://doc.hamer.xin/](http://doc.hamer.xin/)
-- **Bug Reports & Feedback**: Please submit via [GitHub Issues](https://github.com/rebocapofficial/rebocap-ue-plugin/issues).
+- **Bug Reports & Feedback**: Please submit via [GitHub Issues](https://github.com/rebocapofficial/rebocap_ue_plugin/issues).
