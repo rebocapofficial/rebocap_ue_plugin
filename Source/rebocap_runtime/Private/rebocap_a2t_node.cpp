@@ -200,6 +200,28 @@ void FAnimNode_RebocapA2T::ApplyPreset(ERebocapA2TPreset InPreset)
     }
 }
 
+FRotator FAnimNode_RebocapA2T::CalculateMirroredRotator(const FRotator& InRot) const
+{
+    float Roll = bMirrorInvertRoll ? -InRot.Roll : InRot.Roll;
+    float Pitch = bMirrorInvertPitch ? -InRot.Pitch : InRot.Pitch;
+    float Yaw = bMirrorInvertYaw ? -InRot.Yaw : InRot.Yaw;
+    return FRotator(Pitch, Yaw, Roll);
+}
+
+void FAnimNode_RebocapA2T::SyncMirrorLimbOffsets(FName ChangedPropertyName)
+{
+    if (!bMirrorEdit) return;
+
+    RightClavicleOffset = CalculateMirroredRotator(LeftClavicleOffset);
+    RightUpperArmOffset = CalculateMirroredRotator(LeftUpperArmOffset);
+    RightLowerArmOffset = CalculateMirroredRotator(LeftLowerArmOffset);
+    RightHandOffset     = CalculateMirroredRotator(LeftHandOffset);
+
+    RightThighOffset    = CalculateMirroredRotator(LeftThighOffset);
+    RightCalfOffset     = CalculateMirroredRotator(LeftCalfOffset);
+    RightFootOffset     = CalculateMirroredRotator(LeftFootOffset);
+}
+
 FString FAnimNode_RebocapA2T::ToJsonString() const
 {
     TSharedPtr<FJsonObject> RootObject = MakeShared<FJsonObject>();
@@ -474,7 +496,17 @@ void FAnimNode_RebocapA2T::Evaluate_AnyThread(FPoseContext& Output)
 
     auto ApplyLocalRotation = [&](FBoneReference& BoneRef, const FRotator& OffsetRotator)
     {
-        if (BoneRef.BoneIndex == INDEX_NONE || OffsetRotator.IsNearlyZero())
+        if (OffsetRotator.IsNearlyZero())
+        {
+            return;
+        }
+
+        if (BoneRef.BoneIndex == INDEX_NONE)
+        {
+            BoneRef.Initialize(BoneContainer);
+        }
+
+        if (BoneRef.BoneIndex == INDEX_NONE)
         {
             return;
         }

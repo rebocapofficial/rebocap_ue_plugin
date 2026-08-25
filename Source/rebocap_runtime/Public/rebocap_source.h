@@ -39,6 +39,10 @@ public:
     void ManualStop();
     bool ManualStart(uint16_t port);
 
+    // --- 线程优先级控制 ---
+    void SetThreadPriority(EThreadPriority NewPriority);
+    EThreadPriority GetThreadPriority() const { return thread_priority_; }
+
     // --- 单例管理 ---
     static TSharedPtr<FRebocapSource> GetInstance();
     static void SetInstance(TSharedPtr<FRebocapSource> instance);
@@ -69,6 +73,7 @@ private:
 
     // 线程相关
     FRunnableThread* thread_{nullptr};
+    EThreadPriority thread_priority_{TPri_Highest};
     bool running_{true};     
     bool bIsShuttingDown{false}; 
 

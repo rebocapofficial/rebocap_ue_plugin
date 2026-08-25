@@ -4,16 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
+#include "HAL/RunnableThread.h"
 #include "rebocap_ws_sdk_cpp.h"
 
 class FToolBarBuilder;
 class FMenuBuilder;
 
-
 class FrebocapModule : public IModuleInterface
 {
 public:
-
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
@@ -22,34 +21,26 @@ public:
 	void PluginButtonClicked();
 	
 private:
-
 	void RegisterMenus();
-
 	TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
 
-	FReply on_connect_button_click();
+	FReply OnConnectButtonClicked();
+	FReply OnOpenLiveLinkWindowClicked();
+	FReply OnOpenDocsClicked();
+	FReply OnOpenWebsiteClicked();
 
-	// 获取连接按钮文本
-	FText get_connect_button_text() const;
+	FText GetConnectButtonText() const;
+	FSlateColor GetStatusColor() const;
+	FText GetStatusText() const;
 
-	// 获取连接按钮文本
-	FText get_connect_error_text() const;
+	TOptional<uint16> GetPortValue() const;
+	void OnPortChanged(uint16 value);
 
-	// 获取连接端口号
-	TOptional<uint16> get_port_value() const;
-
-	void on_port_change(uint16 value);
-
-	void on_pose_msg_callback(const QuatMsg* msg, rebocap::RebocapWsSdk* sdk);
-	void on_exception_close_callback(rebocap::RebocapWsSdk* sdk);
+	void SetThreadPriority(EThreadPriority NewPriority);
+	bool IsThreadPriority(EThreadPriority CheckPriority) const;
 
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;
-
-	bool is_connect_ = false;
-	uint16 connect_port_ = 7690;
-	void* rebocap_ws_sdk_handle_;
-	std::unique_ptr<rebocap::RebocapWsSdk> rebocap_sdk_;
-
-	TOptional<bool> connect_ok_;
+	uint16 ConnectPort = 7690;
+	void* rebocap_ws_sdk_handle_ = nullptr;
 };

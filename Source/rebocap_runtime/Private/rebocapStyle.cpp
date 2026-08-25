@@ -5,9 +5,10 @@
 #include "Framework/Application/SlateApplication.h"
 #include "Slate/SlateGameResources.h"
 #include "Interfaces/IPluginManager.h"
-#include "Styling/SlateStyleMacros.h"
+#include "Brushes/SlateImageBrush.h"
 
 #define RootToContentDir Style->RootToContentDir
+#define IMAGE_BRUSH( RelativePath, ... ) FSlateImageBrush( RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
 
 TSharedPtr<FSlateStyleSet> FrebocapStyle::StyleInstance = nullptr;
 
@@ -35,13 +36,15 @@ FName FrebocapStyle::GetStyleSetName()
 
 const FVector2D Icon16x16(16.0f, 16.0f);
 const FVector2D Icon20x20(20.0f, 20.0f);
+const FVector2D Icon40x40(40.0f, 40.0f);
 
 TSharedRef< FSlateStyleSet > FrebocapStyle::Create()
 {
 	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("rebocapStyle"));
 	Style->SetContentRoot(IPluginManager::Get().FindPlugin("rebocap")->GetBaseDir() / TEXT("Resources"));
 
-	Style->Set("rebocap.OpenPluginWindow", new IMAGE_BRUSH_SVG(TEXT("PlaceholderButtonIcon"), Icon20x20));
+	Style->Set("rebocap.OpenPluginWindow", new IMAGE_BRUSH(TEXT("Icon128"), Icon40x40));
+	Style->Set("rebocap.OpenPluginWindow.Small", new IMAGE_BRUSH(TEXT("Icon128"), Icon20x20));
 
 	return Style;
 }

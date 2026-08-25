@@ -8,6 +8,14 @@ public class rebocap_runtime : ModuleRules
     public rebocap_runtime(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        if (Target.Version.MajorVersion < 5)
+        {
+            CppStandard = CppStandardVersion.Cpp17;
+        }
+        else
+        {
+            CppStandard = CppStandardVersion.Cpp20;
+        }
 
         // 1. 头文件包含路径
         PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
@@ -39,12 +47,16 @@ public class rebocap_runtime : ModuleRules
             "CoreUObject",
             "Engine",
             "LiveLinkInterface",
-            "LiveLinkAnimationCore", // 关键：处理骨架数据
             "InputCore",
             "Slate",
             "SlateCore",
             "UMG"
         });
+
+        if (Target.Version.MajorVersion >= 5)
+        {
+            PublicDependencyModuleNames.Add("LiveLinkAnimationCore"); // UE5 骨架数据模块
+        }
 
         // 5. 私有模块依赖
         PrivateDependencyModuleNames.AddRange(new string[]

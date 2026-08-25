@@ -5,6 +5,14 @@ public class rebocap_editor : ModuleRules
     public rebocap_editor(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        if (Target.Version.MajorVersion < 5)
+        {
+            CppStandard = CppStandardVersion.Cpp17;
+        }
+        else
+        {
+            CppStandard = CppStandardVersion.Cpp20;
+        }
 
         PublicDependencyModuleNames.AddRange(new string[]
         {
@@ -12,8 +20,19 @@ public class rebocap_editor : ModuleRules
             "CoreUObject",
             "Engine",
             "AnimGraphRuntime",
+            "LiveLinkInterface",
             "rebocap_runtime"
         });
+
+        if (Target.Version.MajorVersion > 5 || (Target.Version.MajorVersion == 5 && Target.Version.MinorVersion >= 1))
+        {
+            PublicDependencyModuleNames.Add("LiveLinkAnimationCore");
+        }
+        else
+        {
+            PublicDependencyModuleNames.Add("LiveLink");
+            PrivateDependencyModuleNames.Add("EditorStyle");
+        }
 
         PrivateDependencyModuleNames.AddRange(new string[]
         {
@@ -24,8 +43,13 @@ public class rebocap_editor : ModuleRules
             "GraphEditor",
             "PropertyEditor",
             "Slate",
-            "SlateCore"
+            "SlateCore",
+            "DesktopPlatform"
         });
 
+        if (Target.Version.MajorVersion < 5)
+        {
+            PrivateDependencyModuleNames.Add("EditorStyle");
+        }
     }
 }

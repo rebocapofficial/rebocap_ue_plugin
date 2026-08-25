@@ -59,6 +59,12 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     /** Apply preset angles */
     void ApplyPreset(ERebocapA2TPreset InPreset);
 
+    /** Calculate mirrored rotator with invert flags */
+    FRotator CalculateMirroredRotator(const FRotator& InRot) const;
+
+    /** Synchronize left limb rotation changes to right limb when mirror edit is enabled */
+    void SyncMirrorLimbOffsets(FName ChangedPropertyName = NAME_None);
+
     /** Export A2T calibration to JSON string */
     FString ToJsonString() const;
 
@@ -110,7 +116,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     FBoneReference RightClavicle;
 
     /** Right Collar / Clavicle Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right Collar / Clavicle Offset", ToolTip = "Right collar / clavicle rotation offset in local space. / 右锁骨局部旋转偏移。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (EditCondition = "!bMirrorEdit", PinHiddenByDefault, DisplayName = "Right Collar / Clavicle Offset", ToolTip = "Right collar / clavicle rotation offset in local space. / 右锁骨局部旋转偏移（开启镜像编辑时由左侧同步，关闭镜像后可单独手改）。"))
     FRotator RightClavicleOffset;
 
     /** Right Shoulder / UpperArm Bone */
@@ -118,7 +124,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     FBoneReference RightUpperArm;
 
     /** Right Shoulder / UpperArm Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right Shoulder / UpperArm Offset", ToolTip = "Right shoulder / upperarm rotation offset in local space. / 右大臂局部旋转偏移。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (EditCondition = "!bMirrorEdit", PinHiddenByDefault, DisplayName = "Right Shoulder / UpperArm Offset", ToolTip = "Right shoulder / upperarm rotation offset in local space. / 右大臂局部旋转偏移（开启镜像编辑时由左侧同步，关闭镜像后可单独手改）。"))
     FRotator RightUpperArmOffset;
 
     /** Right Elbow / LowerArm Bone */
@@ -126,7 +132,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     FBoneReference RightLowerArm;
 
     /** Right Elbow / LowerArm Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right Elbow / LowerArm Offset", ToolTip = "Right elbow / lowerarm rotation offset in local space. / 右小臂局部旋转偏移。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (EditCondition = "!bMirrorEdit", PinHiddenByDefault, DisplayName = "Right Elbow / LowerArm Offset", ToolTip = "Right elbow / lowerarm rotation offset in local space. / 右小臂局部旋转偏移（开启镜像编辑时由左侧同步，关闭镜像后可单独手改）。"))
     FRotator RightLowerArmOffset;
 
     /** Right Wrist / Hand Bone */
@@ -134,7 +140,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     FBoneReference RightHand;
 
     /** Right Wrist / Hand Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (PinHiddenByDefault, DisplayName = "Right Wrist / Hand Offset", ToolTip = "Right wrist / hand rotation offset in local space. / 右手局部旋转偏移。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "2. Right Arm", meta = (EditCondition = "!bMirrorEdit", PinHiddenByDefault, DisplayName = "Right Wrist / Hand Offset", ToolTip = "Right wrist / hand rotation offset in local space. / 右手局部旋转偏移（开启镜像编辑时由左侧同步，关闭镜像后可单独手改）。"))
     FRotator RightHandOffset;
 
     // ==========================================
@@ -174,7 +180,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     FBoneReference RightThigh;
 
     /** Right Hip / Thigh Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (PinHiddenByDefault, DisplayName = "Right Hip / Thigh Offset", ToolTip = "Right hip / thigh rotation offset in local space. / 右大腿局部旋转偏移。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (EditCondition = "!bMirrorEdit", PinHiddenByDefault, DisplayName = "Right Hip / Thigh Offset", ToolTip = "Right thigh rotation offset in local space. / 右大腿局部旋转偏移（开启镜像编辑时由左侧同步，关闭镜像后可单独手改）。"))
     FRotator RightThighOffset;
 
     /** Right Knee / Calf Bone */
@@ -182,7 +188,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     FBoneReference RightCalf;
 
     /** Right Knee / Calf Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (PinHiddenByDefault, DisplayName = "Right Knee / Calf Offset", ToolTip = "Right knee / calf rotation offset in local space. / 右小腿局部旋转偏移。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (EditCondition = "!bMirrorEdit", PinHiddenByDefault, DisplayName = "Right Knee / Calf Offset", ToolTip = "Right knee / calf rotation offset in local space. / 右小腿局部旋转偏移（开启镜像编辑时由左侧同步，关闭镜像后可单独手改）。"))
     FRotator RightCalfOffset;
 
     /** Right Ankle / Foot Bone */
@@ -190,7 +196,7 @@ struct REBOCAP_RUNTIME_API FAnimNode_RebocapA2T : public FAnimNode_Base
     FBoneReference RightFoot;
 
     /** Right Ankle / Foot Rotation Offset */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (PinHiddenByDefault, DisplayName = "Right Ankle / Foot Offset", ToolTip = "Right ankle / foot rotation offset in local space. / 右脚踝局部旋转偏移。"))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "4. Right Leg", meta = (EditCondition = "!bMirrorEdit", PinHiddenByDefault, DisplayName = "Right Ankle / Foot Offset", ToolTip = "Right ankle / foot rotation offset in local space. / 右脚踝局部旋转偏移（开启镜像编辑时由左侧同步，关闭镜像后可单独手改）。"))
     FRotator RightFootOffset;
 
     // ==========================================

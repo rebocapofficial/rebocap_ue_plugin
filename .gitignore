@@ -1,0 +1,11 @@
+# Unreal Engine Plugin GitIgnore
+Intermediate/
+Binaries/Win64/
+*.pdb
+*.exp
+*.obj
+*.rsp
+*.dep.json
+*.old
+.vs/
+.idea/

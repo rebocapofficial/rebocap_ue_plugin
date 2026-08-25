@@ -1,56 +1,48 @@
 {
-	"FileVersion": 3,
-	"Version": 21,
-	"VersionName": "V2.0-beta02",
-	"FriendlyName": "Rebocap - blueprint control",
-	"Description": "",
-	"Category": "Other",
-	"CreatedBy": "Rebocap official",
-	"CreatedByURL": "http://doc.hamer.xin/docs/",
-	"DocsURL": "",
-	"MarketplaceURL": "",
-	"SupportURL": "",
-	"CanContainContent": true,
-	"IsBetaVersion": false,
-	"IsExperimentalVersion": false,
-	"Installed": false,
-	"EnabledByDefault": true,
-	"LocalizationTargets": [
-		{
-			"Name": "rebocap",
-			"LoadingPolicy": "Always",
-			"ConfigGenerationPolicy": "Never"
-		}
-	],
-	"Modules": [
-		{
-			"Name": "rebocap_runtime",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		},
-		{
-			"Name": "rebocap_editor",
-			"Type": "Editor",
-			"LoadingPhase": "Default"
-		},
-		{
-			"Name": "rebocap",
-			"Type": "UncookedOnly",
-			"LoadingPhase": "Default"
-		}
-	],
-	"Plugins": [
-		{
-			"Name": "LiveLink",
-			"Enabled": true
-		},
-		{
-			"Name": "LiveLinkCamera",
-			"Enabled": true
-		},
-		{
-			"Name": "ControlRig",
-			"Enabled": true
-		}
-	]
+    "Category": "Other", 
+    "IsExperimentalVersion": false, 
+    "FileVersion": 3, 
+    "DocsURL": "", 
+    "IsBetaVersion": false, 
+    "Modules": [
+        {
+            "Type": "Runtime", 
+            "Name": "rebocap_runtime", 
+            "LoadingPhase": "Default"
+        }, 
+        {
+            "Type": "UncookedOnly", 
+            "Name": "rebocap_editor", 
+            "LoadingPhase": "Default"
+        }, 
+        {
+            "Type": "UncookedOnly", 
+            "Name": "rebocap", 
+            "LoadingPhase": "Default"
+        }
+    ], 
+    "MarketplaceURL": "", 
+    "CanContainContent": true, 
+    "EnabledByDefault": true, 
+    "CreatedBy": "Rebocap official", 
+    "Version": 27, 
+    "LocalizationTargets": [
+        {
+            "ConfigGenerationPolicy": "Never", 
+            "Name": "rebocap", 
+            "LoadingPolicy": "Always"
+        }
+    ], 
+    "VersionName": "V2.0-beta07", 
+    "Plugins": [
+        {
+            "Enabled": true, 
+            "Name": "LiveLink"
+        }
+    ], 
+    "FriendlyName": "Rebocap - blueprint control", 
+    "Installed": false, 
+    "SupportURL": "", 
+    "CreatedByURL": "http://doc.hamer.xin/docs/", 
+    "Description": ""
 }

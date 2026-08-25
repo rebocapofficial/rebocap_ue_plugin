@@ -4,9 +4,21 @@
 
 #include "Animation/AnimInstanceProxy.h"
 #include "Animation/AnimNodeBase.h"
+#include "BoneControllers/AnimNode_SkeletalControlBase.h"
+#include "LiveLinkRemapAsset.h"
+#include "LiveLinkTypes.h"
 #include "ILiveLinkClient.h"
-#include "Runtime/AnimGraphRuntime/Public/BoneControllers/AnimNode_SkeletalControlBase.h"
-#include "Runtime/LiveLinkAnimationCore/Public/LiveLinkRemapAsset.h"
+#include "Runtime/Launch/Resources/Version.h"
+
+class ILiveLinkClient;
+
+#if ENGINE_MAJOR_VERSION < 5
+typedef FVector FVector3f;
+typedef FVector4 FVector4f;
+typedef FQuat FQuat4f;
+typedef FMatrix FMatrix44f;
+#endif
+
 #include "rebocap_body_remap_asset.h"
 #include "rebocap_pose_node.generated.h"
 
@@ -71,8 +83,9 @@ struct TPose {
 
 // 3. 动画节点
 USTRUCT()
-struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalControlBase {
+struct REBOCAP_RUNTIME_API FRebocapPoseNode : public FAnimNode_SkeletalControlBase {
   GENERATED_USTRUCT_BODY()
+  typedef FAnimNode_SkeletalControlBase Super;
 
   FRebocapPoseNode();
 
@@ -99,7 +112,19 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalCon
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName = "Connect Rebocap", ToolTip = "Controls whether to automatically connect to Rebocap mocap service. / 控制是否连接Rebocap。（默认开启）"))
   bool bAutoConnect = true;
 
-  // 3. 丢包防闪保护 (默认开启)
+  // 3. 动捕帧平滑插值 (默认关闭)
+  /** 
+   * 开启高精度时间四元数平滑插值（SLERP Frame Interpolation）：
+   * 解决 60Hz 动捕数据与高刷游戏渲染帧率（如 120 FPS/144 FPS）采样不同步引起的视觉微顿挫。（默认关闭）
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName = "Enable Frame Interpolation", ToolTip = "Smoothly interpolates mocap data across high-framerate rendering to eliminate stuttering and judder. / 开启高精度四元数平滑插值，消除高帧率画面下的动捕顿挫感。（默认关闭）"))
+  bool bEnableInterpolation = false;
+
+  /** 插值平滑过渡速率（默认 45.0，数值越高越贴近原始输入，推荐 25.0 ~ 60.0 之间）：0 表示关闭平滑。 */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName = "Interpolation Speed", ClampMin = "1.0", ClampMax = "120.0", UIMin = "1.0", UIMax = "120.0", ToolTip = "Interpolation smoothing speed / 插值平滑过渡速率。"))
+  float InterpolationSpeed = 45.0f;
+
+  // 4. 丢包防闪保护 (默认开启)
   /** 控制遇到网络丢包或卡顿断帧时，是否自动保持最后一帧动作，防止角色瞬间闪回 T-Pose（默认开启）。 */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName = "Hold Pose On Dropout", ToolTip = "When enabled, automatically holds the last valid pose during packet drops or lag spikes to prevent flickering into T-Pose. / 控制遇到网络丢包或卡顿断帧时，是否自动保持最后一帧动作，防止画面闪现 1 帧 T-Pose。"))
   bool bHoldPoseOnDropout = true;
@@ -142,7 +167,7 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalCon
   TPose t_pose_;
   bool init_vertices_ = false;
 
-  struct FCachedPoseData {
+  struct FPoseData {
     FQuat pelvis_quat = FQuat::Identity;
     FVector pelvis_position = FVector::ZeroVector;
     FQuat l_hip = FQuat::Identity;
@@ -170,9 +195,11 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode final : public FAnimNode_SkeletalCon
     FQuat r_hand = FQuat::Identity;
   };
 
-  FCachedPoseData cached_pose_data_;
+  FPoseData cached_pose_data_;
+  FPoseData interpolated_pose_data_;
   double last_valid_frame_time_ = 0.0;
   bool bHasValidFrameCached_ = false;
+  bool bHasInterpolatedPoseCached_ = false;
 
   TArray<FVector3f> LeftVertices_, LeftNormals_, RightVertices_, RightNormals_, SkeletonPosition_;
 };

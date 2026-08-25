@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleInterface.h"
@@ -15,6 +15,16 @@ public:
   static inline bool IsAvailable()
   {
     return FModuleManager::Get().IsModuleLoaded("rebocap_runtime");
+  }
+
+  bool IsSdkLoaded() const
+  {
+    return rebocap_ws_sdk_handle_ != nullptr;
+  }
+
+  void* GetSdkHandle() const
+  {
+    return rebocap_ws_sdk_handle_;
   }
 
   virtual void StartupModule() override;

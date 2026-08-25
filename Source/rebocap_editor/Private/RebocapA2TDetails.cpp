@@ -1,4 +1,5 @@
 #include "RebocapA2TDetails.h"
+#include "RebocapEditorStyleCompat.h"
 #include "DetailLayoutBuilder.h"
 #include "DetailCategoryBuilder.h"
 #include "DetailWidgetRow.h"
@@ -30,7 +31,7 @@ void FRebocapA2TDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
         .Padding(0.0f, 4.0f, 4.0f, 4.0f)
         [
             SNew(SButton)
-            .ButtonStyle(FAppStyle::Get(), "Button")
+            .ButtonStyle(REBOCAP_STYLE::Get(), "Button")
             .ContentPadding(FMargin(10.0f, 4.0f))
             .ToolTipText(LOCTEXT("ExportA2TJsonTooltip", "Export current A2T calibration angles and bone mappings to JSON. / 导出当前 A2T 肢体偏转与骨骼配置为 JSON 文件。"))
             .OnClicked_Lambda([ObjectsBeingCustomized]() -> FReply {
@@ -47,7 +48,7 @@ void FRebocapA2TDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
             [
                 SNew(STextBlock)
                 .Text(LOCTEXT("ExportA2TJsonButton", "📤 Export to JSON"))
-                .Font(FAppStyle::GetFontStyle(TEXT("NormalFontBold")))
+                .Font(REBOCAP_STYLE::GetFontStyle(TEXT("NormalFontBold")))
             ]
         ]
         + SHorizontalBox::Slot()
@@ -55,7 +56,7 @@ void FRebocapA2TDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
         .Padding(4.0f, 4.0f, 0.0f, 4.0f)
         [
             SNew(SButton)
-            .ButtonStyle(FAppStyle::Get(), "Button")
+            .ButtonStyle(REBOCAP_STYLE::Get(), "Button")
             .ContentPadding(FMargin(10.0f, 4.0f))
             .ToolTipText(LOCTEXT("ImportA2TJsonTooltip", "Import A2T calibration JSON configuration to auto-fill limb angles and bone mappings. / 从 JSON 文件导入 A2T 姿态配置。"))
             .OnClicked_Lambda([ObjectsBeingCustomized, &DetailBuilder]() -> FReply {
@@ -72,7 +73,7 @@ void FRebocapA2TDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
             [
                 SNew(STextBlock)
                 .Text(LOCTEXT("ImportA2TJsonButton", "📥 Import from JSON"))
-                .Font(FAppStyle::GetFontStyle(TEXT("NormalFontBold")))
+                .Font(REBOCAP_STYLE::GetFontStyle(TEXT("NormalFontBold")))
             ]
         ]
     ];

@@ -1,4 +1,5 @@
 #include "RebocapMapDataDetails.h"
+#include "RebocapEditorStyleCompat.h"
 #include "DetailLayoutBuilder.h"
 #include "DetailCategoryBuilder.h"
 #include "DetailWidgetRow.h"
@@ -30,7 +31,7 @@ void FRebocapMapDataDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilde
         .Padding(0.0f, 4.0f, 4.0f, 4.0f)
         [
             SNew(SButton)
-            .ButtonStyle(FAppStyle::Get(), "Button")
+            .ButtonStyle(REBOCAP_STYLE::Get(), "Button")
             .ContentPadding(FMargin(10.0f, 4.0f))
             .ToolTipText(LOCTEXT("ExportJsonTooltip", "Export current 24 bone names and foot vertices to JSON (fully compatible with Blender plugin format). / 导出当前骨骼配置为 JSON 文件。"))
             .OnClicked_Lambda([ObjectsBeingCustomized]() -> FReply {
@@ -47,7 +48,7 @@ void FRebocapMapDataDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilde
             [
                 SNew(STextBlock)
                 .Text(LOCTEXT("ExportJsonButton", "📤 Export to JSON"))
-                .Font(FAppStyle::GetFontStyle(TEXT("NormalFontBold")))
+                .Font(REBOCAP_STYLE::GetFontStyle(TEXT("NormalFontBold")))
             ]
         ]
         + SHorizontalBox::Slot()
@@ -55,7 +56,7 @@ void FRebocapMapDataDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilde
         .Padding(4.0f, 4.0f, 0.0f, 4.0f)
         [
             SNew(SButton)
-            .ButtonStyle(FAppStyle::Get(), "Button")
+            .ButtonStyle(REBOCAP_STYLE::Get(), "Button")
             .ContentPadding(FMargin(10.0f, 4.0f))
             .ToolTipText(LOCTEXT("ImportJsonTooltip", "Select and import JSON configuration to auto-fill bone names and foot vertices (fully compatible with Blender plugin format). / 从 JSON 文件导入骨骼配置。"))
             .OnClicked_Lambda([ObjectsBeingCustomized, &DetailBuilder]() -> FReply {
@@ -64,7 +65,6 @@ void FRebocapMapDataDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilde
                     if (URebocapMapData* MapData = Cast<URebocapMapData>(WeakObj.Get()))
                     {
                         MapData->ImportFromJson();
-                        MapData->MarkPackageDirty();
                     }
                 }
                 DetailBuilder.ForceRefreshDetails();
@@ -73,7 +73,7 @@ void FRebocapMapDataDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilde
             [
                 SNew(STextBlock)
                 .Text(LOCTEXT("ImportJsonButton", "📥 Import from JSON"))
-                .Font(FAppStyle::GetFontStyle(TEXT("NormalFontBold")))
+                .Font(REBOCAP_STYLE::GetFontStyle(TEXT("NormalFontBold")))
             ]
         ]
     ];

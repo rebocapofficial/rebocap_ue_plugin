@@ -1,9 +1,11 @@
 #include "rebocap_source.h"
+#include "rebocap_runtime.h"
 #include "rebocap_ws_sdk_cpp.h"
 #include "rebocap_skeleton_data.h"
 #include "Roles/LiveLinkAnimationRole.h"
 #include "ILiveLinkClient.h" 
 #include "Async/Async.h"
+#include "Misc/QualifiedFrameTime.h"
 
 // 静态变量初始化
 TSharedPtr<FRebocapSource> FRebocapSource::instance_ = nullptr;
@@ -14,6 +16,22 @@ FRebocapSource::FRebocapSource(uint16_t port)
 {
     client_ = nullptr;
     
+    // 【加固保护】：若底层 DLL 未加载成功，绝不调用底层 SDK 函数，彻底杜绝 0xc06d007e Delay-Load 崩溃
+    bool bSdkLoaded = false;
+    if (FModuleManager::Get().IsModuleLoaded("rebocap_runtime"))
+    {
+        bSdkLoaded = Frebocap_runtimeModule::Get().IsSdkLoaded();
+    }
+
+    if (!bSdkLoaded)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("========================================================================"));
+        UE_LOG(LogTemp, Warning, TEXT("[Rebocap] 动捕底层运行库未加载 (可能缺少微软 vc_redist.x64)。"));
+        UE_LOG(LogTemp, Warning, TEXT("[Rebocap] 虚幻引擎已正常启动。若需使用动捕功能，请安装: https://aka.ms/vs/17/release/vc_redist.x64.exe"));
+        UE_LOG(LogTemp, Warning, TEXT("========================================================================"));
+        return;
+    }
+
     // 初始化 SDK 对象
     rebocap_sdk_ = MakeShared<rebocap::RebocapWsSdk>(CoordinateSpaceType::UECoordinate, true);
     
@@ -39,7 +57,7 @@ FRebocapSource::FRebocapSource(uint16_t port)
     // ================== 【修复结束】 ==================
 
     FString ThreadName(FString::Printf(TEXT("FRebocapSource_%d_%lld"), port, FDateTime::UtcNow().ToUnixTimestamp()));
-    thread_ = FRunnableThread::Create(this, *ThreadName, 512 * 1024, TPri_Normal);
+    thread_ = FRunnableThread::Create(this, *ThreadName, 512 * 1024, thread_priority_);
 
     UE_LOG(LogTemp, Display, TEXT("New Rebocap Source created on port: %d"), port);
 }
@@ -148,6 +166,13 @@ void FRebocapSource::ManualStop() {
     running_ = false;
 }
 
+void FRebocapSource::SetThreadPriority(EThreadPriority NewPriority) {
+    thread_priority_ = NewPriority;
+    if (thread_) {
+        thread_->SetThreadPriority(NewPriority);
+    }
+}
+
 bool FRebocapSource::ManualStart(uint16_t port) {
     // 【修复】防止在 Cook 模式下手动启动
     if (IsRunningCommandlet()) return false;
@@ -156,7 +181,7 @@ bool FRebocapSource::ManualStart(uint16_t port) {
     if (!running_ && !status_) {
         running_ = true;
         FString ThreadName(FString::Printf(TEXT("FRebocapSource_%d_Restart"), port));
-        thread_ = FRunnableThread::Create(this, *ThreadName, 512 * 1024, TPri_Normal);
+        thread_ = FRunnableThread::Create(this, *ThreadName, 512 * 1024, thread_priority_);
     }
     return running_;
 }
@@ -184,7 +209,7 @@ void FRebocapSource::pose_msg_callback(const QuatMsg* msg) {
 
     FName subject = "rebocap";
     
-    // 1. 推送静态数据
+    // 1. 推送静态数据 (声明 60 FPS 采样率)
     {
         FLiveLinkStaticDataStruct static_data_struct = FLiveLinkStaticDataStruct(FLiveLinkSkeletonStaticData::StaticStruct());
         FLiveLinkSkeletonStaticData& static_data = *static_data_struct.Cast<FLiveLinkSkeletonStaticData>();
@@ -213,7 +238,9 @@ void FRebocapSource::pose_msg_callback(const QuatMsg* msg) {
     // 2. 推送帧数据
     FLiveLinkFrameDataStruct frame = FLiveLinkFrameDataStruct(FLiveLinkAnimationFrameData::StaticStruct());
     FLiveLinkBaseFrameData* base_data = frame.GetBaseData();
-    base_data->WorldTime = FLiveLinkWorldTime(FPlatformTime::Seconds());
+    const double CurrentTime = FPlatformTime::Seconds();
+    base_data->WorldTime = FLiveLinkWorldTime(CurrentTime);
+    base_data->MetaData.SceneTime = FQualifiedFrameTime(FFrameTime(FFrameNumber((int32)(CurrentTime * 60.0))), FFrameRate(60, 1));
     
     FLiveLinkAnimationFrameData& frame_data = *frame.Cast<FLiveLinkAnimationFrameData>();
     frame_data.Transforms.Reserve(24);
@@ -221,9 +248,9 @@ void FRebocapSource::pose_msg_callback(const QuatMsg* msg) {
     for (int i = 0; i < 96; i += 4) {
         FTransform transform;
         if (i == 0) {
-             transform.SetTranslation(FVector(msg->trans[0], msg->trans[1], msg->trans[2]));
+            transform.SetTranslation(FVector(msg->trans[0], msg->trans[1], msg->trans[2]));
         } else {
-             transform.SetTranslation(FVector::ZeroVector);
+            transform.SetTranslation(FVector::ZeroVector);
         }
         
         // 【关键修复：防止频闪】

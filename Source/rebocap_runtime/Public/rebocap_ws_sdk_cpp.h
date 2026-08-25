@@ -5,7 +5,15 @@
 #endif
 #include "rebocap_ws_sdk.h"
 #include "CoreMinimal.h"        
-#include "Math/Vector.h"        
+#include "Math/Vector.h"
+#include "Runtime/Launch/Resources/Version.h"
+
+#if ENGINE_MAJOR_VERSION < 5
+typedef FVector FVector3f;
+typedef FVector4 FVector4f;
+typedef FQuat FQuat4f;
+typedef FMatrix FMatrix44f;
+#endif        
 #include <functional>
 #include <memory>
 #include <string>

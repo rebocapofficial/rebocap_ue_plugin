@@ -11,6 +11,14 @@ public class rebocap : ModuleRules
 		bUseUnity = false;
 		
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		if (Target.Version.MajorVersion < 5)
+		{
+			CppStandard = CppStandardVersion.Cpp17;
+		}
+		else
+		{
+			CppStandard = CppStandardVersion.Cpp20;
+		}
 		PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
 		PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Private"));
 
@@ -46,11 +54,15 @@ public class rebocap : ModuleRules
 				"AnimGraphRuntime",
 				"BlueprintGraph",
 				"Core",
-				"LiveLinkAnimationCore",
                 "LiveLinkInterface",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
+
+		if (Target.Version.MajorVersion >= 5)
+		{
+			PublicDependencyModuleNames.Add("LiveLinkAnimationCore");
+		}
 			
 		
 		PrivateDependencyModuleNames.AddRange(
