@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <atomic>
 #include "CoreMinimal.h"
 #include "HAL/Runnable.h"
 #include "HAL/RunnableThread.h"
@@ -39,6 +40,9 @@ public:
     void ManualStop();
     bool ManualStart(uint16_t port);
 
+    // --- 实时动捕流频率统计 (Hz) ---
+    float GetMocapHz() const;
+
     // --- 线程优先级控制 ---
     void SetThreadPriority(EThreadPriority NewPriority);
     EThreadPriority GetThreadPriority() const { return thread_priority_; }
@@ -50,6 +54,7 @@ public:
     // --- 全局静态开关 ---
     static bool bAutoSkeleton;          
     static bool bUserOverrideDisconnect; // 保留定义以防链接错误
+    static bool bZeroAllocStaticSubject; // [实验性] 零开销 LiveLink 数据构建开关 (默认关闭)
 
 private:
     // --- FRunnable 线程接口 ---
@@ -70,6 +75,11 @@ private:
     
     uint16_t port_;
     bool status_{false}; // 连接状态
+
+    // 实时动捕帧率统计
+    std::atomic<float> current_mocap_hz_{0.0f};
+    double last_fps_calc_time_{0.0};
+    uint32_t frames_in_period_{0};
 
     // 线程相关
     FRunnableThread* thread_{nullptr};

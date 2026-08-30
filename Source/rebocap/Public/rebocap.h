@@ -29,9 +29,19 @@ private:
 	FReply OnOpenDocsClicked();
 	FReply OnOpenWebsiteClicked();
 
+	FReply OnStartProfilerClicked();
+	FReply OnOpenLogsFolderClicked();
+
 	FText GetConnectButtonText() const;
 	FSlateColor GetStatusColor() const;
 	FText GetStatusText() const;
+
+	FText GetMocapHzText() const;
+	FSlateColor GetMocapHzColor() const;
+	FText GetViewportFPSText() const;
+
+	FText GetProfilerButtonText() const;
+	FSlateColor GetProfilerButtonColor() const;
 
 	TOptional<uint16> GetPortValue() const;
 	void OnPortChanged(uint16 value);

@@ -8,7 +8,7 @@
 **官方 Rebocap 虚幻引擎 LiveLink 动捕插件（支持 UE 4.26 至 UE 5.8 全版本）**
 
 [![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-4.26%20~%205.8-blue.svg?logo=unrealengine)](https://www.unrealengine.com/)
-[![Release Version](https://img.shields.io/badge/Release-V2.0--beta07-brightgreen.svg)](https://github.com/rebocapofficial/rebocap_ue_plugin/releases)
+[![Release Version](https://img.shields.io/badge/Release-V2.0--beta10-brightgreen.svg)](https://github.com/rebocapofficial/rebocap_ue_plugin/releases)
 [![License](https://img.shields.io/badge/License-MIT-orange.svg)](LICENSE)
 [![Doc](https://img.shields.io/badge/Documentation-doc.hamer.xin-blueviolet)](http://doc.hamer.xin/)
 

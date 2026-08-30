@@ -13,6 +13,11 @@
 #include "ILiveLinkClient.h"
 #include "LiveLinkRemapAsset.h"
 #include "UObject/Package.h" 
+#include "Engine/Engine.h" 
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/SkeletalMesh.h"
+#include "Animation/Skeleton.h"
+#include "rebocap_profiler.h" 
 
 FRebocapPoseNode::FRebocapPoseNode()
     : LiveLinkSubjectName("rebocap")
@@ -207,6 +212,14 @@ void FRebocapPoseNode::Init_Foot_Vertices_And_SkeletalData(USkeletalMeshComponen
   if (init_vertices_) return;
   if (!FRebocapSource::bAutoSkeleton) return; 
 
+  if (bThrottleSkeletonRegistration) {
+      const double Now = FPlatformTime::Seconds();
+      if (Now - last_skeleton_submit_time_ < 2.0) {
+          return;
+      }
+      last_skeleton_submit_time_ = Now;
+  }
+
   if (t_pose_.pelvis) {
     if (LeftVertices_.Num() == 0 && RightVertices_.Num() == 0) {
 #if WITH_EDITOR
@@ -265,15 +278,89 @@ void FRebocapPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
   
   Init_Tpose_Bone(bone_map_, mesh_bases, t_pose_);
   Init_Foot_Vertices_And_SkeletalData(skel_comp);
+
+  if (FRebocapProfiler::Get().IsRecording() && skel_comp) {
+      FRebocapBoneMappingInfo BoneInfo;
+#if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 2
+      if (skel_comp->GetSkeletalMeshAsset()) {
+          BoneInfo.MeshName = skel_comp->GetSkeletalMeshAsset()->GetName();
+          if (skel_comp->GetSkeletalMeshAsset()->GetSkeleton()) {
+              BoneInfo.SkeletonName = skel_comp->GetSkeletalMeshAsset()->GetSkeleton()->GetName();
+          }
+      }
+      BoneInfo.LODLevel = skel_comp->GetPredictedLODLevel();
+#elif ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION <= 26
+      if (skel_comp->SkeletalMesh) {
+          BoneInfo.MeshName = skel_comp->SkeletalMesh->GetName();
+          if (skel_comp->SkeletalMesh->Skeleton) {
+              BoneInfo.SkeletonName = skel_comp->SkeletalMesh->Skeleton->GetName();
+          }
+      }
+      BoneInfo.LODLevel = skel_comp->PredictedLODLevel;
+#else
+      if (skel_comp->SkeletalMesh) {
+          BoneInfo.MeshName = skel_comp->SkeletalMesh->GetName();
+          if (skel_comp->SkeletalMesh->GetSkeleton()) {
+              BoneInfo.SkeletonName = skel_comp->SkeletalMesh->GetSkeleton()->GetName();
+          }
+      }
+      BoneInfo.LODLevel = skel_comp->GetPredictedLODLevel();
+#endif
+      BoneInfo.BoneCount = skel_comp->GetNumBones();
+      BoneInfo.RetargetAssetName = retarget_asset_ ? retarget_asset_->GetName() : TEXT("None");
+
+      auto AddBone = [&](const FString& RebocapName, const FBoneReference& BoneRef) {
+          BoneInfo.BoneMap.Add(RebocapName, BoneRef.BoneName.ToString());
+      };
+
+      AddBone(TEXT("Pelvis (盆骨)"), bone_map_.Pelvis);
+      AddBone(TEXT("L_Hip (左大腿)"), bone_map_.L_Hip);
+      AddBone(TEXT("R_Hip (右大腿)"), bone_map_.R_Hip);
+      AddBone(TEXT("Spine1 (脊椎1)"), bone_map_.Spine1);
+      AddBone(TEXT("L_Knee (左膝盖)"), bone_map_.L_Knee);
+      AddBone(TEXT("R_Knee (右膝盖)"), bone_map_.R_Knee);
+      AddBone(TEXT("Spine2 (脊椎2)"), bone_map_.Spine2);
+      AddBone(TEXT("L_Ankle (左脚踝)"), bone_map_.L_Ankle);
+      AddBone(TEXT("R_Ankle (右脚踝)"), bone_map_.R_Ankle);
+      AddBone(TEXT("Spine3 (脊椎3)"), bone_map_.Spine3);
+      AddBone(TEXT("L_Foot (左脚掌)"), bone_map_.L_Foot);
+      AddBone(TEXT("R_Foot (右脚掌)"), bone_map_.R_Foot);
+      AddBone(TEXT("Neck (脖子)"), bone_map_.Neck);
+      AddBone(TEXT("L_Collar (左锁骨)"), bone_map_.L_Collar);
+      AddBone(TEXT("R_Collar (右锁骨)"), bone_map_.R_Collar);
+      AddBone(TEXT("Head (头部)"), bone_map_.Head);
+      AddBone(TEXT("L_Shoulder (左大臂)"), bone_map_.L_Shoulder);
+      AddBone(TEXT("R_Shoulder (右大臂)"), bone_map_.R_Shoulder);
+      AddBone(TEXT("L_Elbow (左小臂)"), bone_map_.L_Elbow);
+      AddBone(TEXT("R_Elbow (右小臂)"), bone_map_.R_Elbow);
+      AddBone(TEXT("L_Wrist (左手腕)"), bone_map_.L_Wrist);
+      AddBone(TEXT("R_Wrist (右手腕)"), bone_map_.R_Wrist);
+      AddBone(TEXT("L_Hand (左手掌)"), bone_map_.L_Hand);
+      AddBone(TEXT("R_Hand (右手掌)"), bone_map_.R_Hand);
+
+      FRebocapProfiler::Get().UpdateSkeletalContext(BoneInfo);
+  }
   
   FLiveLinkSubjectFrameData subject_frame_data;
   FLiveLinkSubjectName live_link_subject_name = FName("rebocap");
   
+  TSubclassOf<ULiveLinkRole> subject_role;
+  if (bOptimizeFrameEvaluation) {
+      if (!cached_subject_role_) {
 #if ENGINE_MAJOR_VERSION >= 5
-  TSubclassOf<ULiveLinkRole> subject_role = live_link_client_->GetSubjectRole_AnyThread(live_link_subject_name);
+          cached_subject_role_ = live_link_client_->GetSubjectRole_AnyThread(live_link_subject_name);
 #else
-  TSubclassOf<ULiveLinkRole> subject_role = live_link_client_->GetSubjectRole(live_link_subject_name);
+          cached_subject_role_ = live_link_client_->GetSubjectRole(live_link_subject_name);
 #endif
+      }
+      subject_role = cached_subject_role_;
+  } else {
+#if ENGINE_MAJOR_VERSION >= 5
+      subject_role = live_link_client_->GetSubjectRole_AnyThread(live_link_subject_name);
+#else
+      subject_role = live_link_client_->GetSubjectRole(live_link_subject_name);
+#endif
+  }
   if (!subject_role) return;
   
   bool bGotLiveLinkFrame = false;
@@ -413,6 +500,21 @@ void FRebocapPoseNode::PreUpdate(const UAnimInstance* InAnimInstance) {
   Super::PreUpdate(InAnimInstance);
 
   FRebocapSource::bAutoSkeleton = bAutoSkeleton;
+  FRebocapSource::bZeroAllocStaticSubject = bZeroAllocStaticSubject;
+
+  if (FRebocapProfiler::Get().IsRecording()) {
+      FRebocapNodeConfigSnapshot Snap;
+      Snap.bAutoSkeleton = bAutoSkeleton;
+      Snap.bAutoConnect = bAutoConnect;
+      Snap.bEnableInterpolation = bEnableInterpolation;
+      Snap.InterpolationSpeed = InterpolationSpeed;
+      Snap.bHoldPoseOnDropout = bHoldPoseOnDropout;
+      Snap.DropoutTimeout = DropoutTimeout;
+      Snap.bThrottleSkeletonRegistration = bThrottleSkeletonRegistration;
+      Snap.bZeroAllocStaticSubject = bZeroAllocStaticSubject;
+      Snap.bOptimizeFrameEvaluation = bOptimizeFrameEvaluation;
+      FRebocapProfiler::Get().UpdateNodeConfig(Snap);
+  }
 
   UpdateConnectionState();
 
@@ -433,6 +535,66 @@ void FRebocapPoseNode::PreUpdate(const UAnimInstance* InAnimInstance) {
       current_retarget_asset_ = NewObject<ULiveLinkRemapAsset>(GetTransientPackage(), retarget_asset_ptr);
       current_retarget_asset_->Initialize();
     }
+  }
+
+  // 5. 视口实时诊断 HUD (平滑覆盖打印在视口左上角)
+  if (bShowDebugHUD && GEngine)
+  {
+      float MocapHz = 0.0f;
+      bool bConnected = false;
+      auto Source = FRebocapSource::GetInstance();
+      if (Source.IsValid())
+      {
+          bConnected = Source->IsPortOpen();
+          MocapHz = Source->GetMocapHz();
+      }
+
+      float DeltaSeconds = FApp::GetDeltaTime();
+      float RenderFPS = DeltaSeconds > 0.0f ? (1.0f / DeltaSeconds) : 0.0f;
+
+      FColor StatusColor = FColor::Red;
+      FString StatusStr = TEXT("未连接 (Disconnected)");
+      if (bConnected)
+      {
+          if (MocapHz >= 50.0f)
+          {
+              StatusColor = FColor(50, 255, 100);
+              StatusStr = TEXT("极佳 (Smooth)");
+          }
+          else if (MocapHz > 0.0f)
+          {
+              StatusColor = FColor::Yellow;
+              StatusStr = TEXT("波动/丢帧 (Low Rate)");
+          }
+          else
+          {
+              StatusColor = FColor(255, 165, 0); // Orange
+              StatusStr = TEXT("等待数据 (Waiting Data)");
+          }
+      }
+
+      FString Msg = FString::Printf(TEXT("[Rebocap Mocap] 动捕流: %.1f Hz | 视口渲染: %.1f FPS | 状态: %s"),
+          MocapHz, RenderFPS, *StatusStr);
+      GEngine->AddOnScreenDebugMessage(775511, 0.0f, StatusColor, Msg);
+  }
+
+  // 6. 诊断黑匣子录制中采样与 HUD 提示
+  if (FRebocapProfiler::Get().IsRecording()) {
+      float MocapHz = 0.0f;
+      bool bConnected = false;
+      auto Source = FRebocapSource::GetInstance();
+      if (Source.IsValid()) {
+          bConnected = Source->IsPortOpen();
+          MocapHz = Source->GetMocapHz();
+      }
+      float DeltaSeconds = FApp::GetDeltaTime();
+      FRebocapProfiler::Get().SampleFrame(DeltaSeconds, MocapHz, bConnected);
+
+      if (GEngine) {
+          FString ProfilerMsg = FString::Printf(TEXT("[● Rebocap 诊断日志采集] 正在录制中... 剩余 %.1f 秒"),
+              FRebocapProfiler::Get().GetRemainingTime());
+          GEngine->AddOnScreenDebugMessage(775522, 0.0f, FColor::Cyan, ProfilerMsg);
+      }
   }
 }
 

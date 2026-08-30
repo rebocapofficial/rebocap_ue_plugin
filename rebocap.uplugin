@@ -25,7 +25,7 @@
     "CanContainContent": true, 
     "EnabledByDefault": true, 
     "CreatedBy": "Rebocap official", 
-    "Version": 28, 
+    "Version": 30, 
     "LocalizationTargets": [
         {
             "ConfigGenerationPolicy": "Never", 
@@ -33,7 +33,7 @@
             "LoadingPolicy": "Always"
         }
     ], 
-    "VersionName": "V2.0-beta08", 
+    "VersionName": "V2.0-beta10", 
     "Plugins": [
         {
             "Enabled": true, 

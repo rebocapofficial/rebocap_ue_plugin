@@ -1,6 +1,7 @@
 #include "RebocapLivelinkBluePrintManager.h"
 
 #include "rebocap_source.h"
+#include "rebocap_profiler.h"
 #include "Features/IModularFeatures.h"
 #include "LiveLinkClient.h"  
 #include "ILiveLinkClient.h" 
@@ -44,4 +45,20 @@ bool URebocapLivelinkBluePrintManager::IsConnectedToRebocap() {
     return Source->IsPortOpen();
   }
   return false;
+}
+
+float URebocapLivelinkBluePrintManager::GetMocapFrameRate() {
+  auto Source = FRebocapSource::GetInstance();
+  if (Source.IsValid()) {
+    return Source->GetMocapHz();
+  }
+  return 0.0f;
+}
+
+void URebocapLivelinkBluePrintManager::StartDiagnosticRecording(float DurationSeconds) {
+  FRebocapProfiler::Get().StartRecording(DurationSeconds);
+}
+
+bool URebocapLivelinkBluePrintManager::IsDiagnosticRecording() {
+  return FRebocapProfiler::Get().IsRecording();
 }

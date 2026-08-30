@@ -20,6 +20,8 @@
 #include "ILiveLinkClient.h"
 #include "Framework/Application/SlateApplication.h"
 #include "HAL/PlatformProcess.h"
+#include "Misc/Paths.h"
+#include "rebocap_profiler.h"
 #include "Styling/CoreStyle.h"
 #include "Runtime/Launch/Resources/Version.h"
 
@@ -113,13 +115,21 @@ TSharedRef<SDockTab> FrebocapModule::OnSpawnPluginTab(const FSpawnTabArgs& Spawn
 					.VAlign(VAlign_Center)
 					[
 						SNew(SBorder)
-						.BorderImage(REBOCAP_STYLE_GET().GetBrush("Menu.Heading"))
-						.Padding(FMargin(4.0f, 1.0f))
+						.BorderImage(REBOCAP_STYLE_GET().GetBrush("ToolPanel.DarkGroupBorder"))
+						.BorderBackgroundColor(FLinearColor(0.08f, 0.25f, 0.45f, 1.0f))
+						.Padding(FMargin(6.0f, 2.0f))
 						[
 							SNew(STextBlock)
-							.Text(FText::FromString(TEXT("V2.0-beta07")))
-							.Font(FCoreStyle::GetDefaultFontStyle("Regular", 9))
-							.ColorAndOpacity(FLinearColor(0.2f, 0.8f, 1.0f))
+							.Text_Lambda([]() {
+								TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(TEXT("rebocap"));
+								if (Plugin.IsValid() && !Plugin->GetDescriptor().VersionName.IsEmpty())
+								{
+									return FText::FromString(Plugin->GetDescriptor().VersionName);
+								}
+								return FText::FromString(TEXT("V2.0-beta09"));
+							})
+							.Font(FCoreStyle::GetDefaultFontStyle("Bold", 9))
+							.ColorAndOpacity(FLinearColor(0.35f, 0.9f, 1.0f))
 						]
 					]
 				]
@@ -227,10 +237,73 @@ TSharedRef<SDockTab> FrebocapModule::OnSpawnPluginTab(const FSpawnTabArgs& Spawn
 					]
 				]
 
-				// 3. ⚡ 线程调度优先级选择
+				// 3. 📊 实时数据流与帧率监控 (Performance & Stream Monitor)
 				+ SVerticalBox::Slot()
 				.AutoHeight()
-				.Padding(0.0f, 8.0f, 0.0f, 4.0f)
+				.Padding(0.0f, 6.0f, 0.0f, 6.0f)
+				[
+					SNew(SBorder)
+					.BorderImage(REBOCAP_STYLE_GET().GetBrush("ToolPanel.DarkGroupBorder"))
+					.Padding(FMargin(10.0f, 6.0f))
+					[
+						SNew(SVerticalBox)
+						+ SVerticalBox::Slot()
+						.AutoHeight()
+						[
+							SNew(SHorizontalBox)
+							// 动捕数据流频率
+							+ SHorizontalBox::Slot()
+							.AutoWidth()
+							.VAlign(VAlign_Center)
+							[
+								SNew(STextBlock)
+								.Text(LOCTEXT("MocapHzLabel", "动捕接收频率: "))
+								.ColorAndOpacity(FSlateColor(FLinearColor(0.8f, 0.8f, 0.8f)))
+							]
+							+ SHorizontalBox::Slot()
+							.AutoWidth()
+							.VAlign(VAlign_Center)
+							.Padding(0.0f, 0.0f, 16.0f, 0.0f)
+							[
+								SNew(STextBlock)
+								.Text_Raw(this, &FrebocapModule::GetMocapHzText)
+								.ColorAndOpacity_Raw(this, &FrebocapModule::GetMocapHzColor)
+							]
+							// 引擎视口渲染帧率
+							+ SHorizontalBox::Slot()
+							.AutoWidth()
+							.VAlign(VAlign_Center)
+							[
+								SNew(STextBlock)
+								.Text(LOCTEXT("RenderFPSLabel", "视口渲染帧率: "))
+								.ColorAndOpacity(FSlateColor(FLinearColor(0.8f, 0.8f, 0.8f)))
+							]
+							+ SHorizontalBox::Slot()
+							.AutoWidth()
+							.VAlign(VAlign_Center)
+							[
+								SNew(STextBlock)
+								.Text_Raw(this, &FrebocapModule::GetViewportFPSText)
+								.ColorAndOpacity(FSlateColor(FLinearColor(0.4f, 0.85f, 1.0f)))
+							]
+						]
+						// 卡顿排查快捷提示
+						+ SVerticalBox::Slot()
+						.AutoHeight()
+						.Padding(0.0f, 4.0f, 0.0f, 0.0f)
+						[
+							SNew(STextBlock)
+							.Text(LOCTEXT("StutterTip", "提示：若视口掉帧，请确认视口已开启 Realtime 模式（Ctrl+R）；若高刷屏微顿挫，可在动画蓝图节点开启【帧平滑插值】。"))
+							.ColorAndOpacity(FSlateColor(FLinearColor(0.65f, 0.65f, 0.65f)))
+							.Font(REBOCAP_STYLE_GET().GetFontStyle("NormalFont"))
+						]
+					]
+				]
+
+				// 4. ⚡ 线程调度优先级选择
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(0.0f, 4.0f, 0.0f, 4.0f)
 				[
 					SNew(SHorizontalBox)
 					+ SHorizontalBox::Slot()
@@ -277,6 +350,46 @@ TSharedRef<SDockTab> FrebocapModule::OnSpawnPluginTab(const FSpawnTabArgs& Spawn
 						.OnCheckStateChanged_Lambda([this](ECheckBoxState State) { if (State == ECheckBoxState::Checked) SetThreadPriority(TPri_Highest); })
 						[
 							SNew(STextBlock).Text(LOCTEXT("PriHighest", "最高优先级 (Highest)"))
+						]
+					]
+				]
+
+				// 5. 🛠️ 性能与运行诊断日志采集 (10s Diagnostic Blackbox)
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(0.0f, 6.0f, 0.0f, 4.0f)
+				[
+					SNew(SBorder)
+					.BorderImage(REBOCAP_STYLE_GET().GetBrush("ToolPanel.GroupBorder"))
+					.Padding(FMargin(10.0f, 6.0f))
+					[
+						SNew(SHorizontalBox)
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.VAlign(VAlign_Center)
+						.Padding(0.0f, 0.0f, 8.0f, 0.0f)
+						[
+							SNew(SButton)
+							.OnClicked_Raw(this, &FrebocapModule::OnStartProfilerClicked)
+							.ContentPadding(FMargin(12.0f, 4.0f))
+							.ButtonColorAndOpacity_Raw(this, &FrebocapModule::GetProfilerButtonColor)
+							[
+								SNew(STextBlock)
+								.Text_Raw(this, &FrebocapModule::GetProfilerButtonText)
+								.Font(REBOCAP_STYLE_GET().GetFontStyle("NormalFontBold"))
+							]
+						]
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.VAlign(VAlign_Center)
+						[
+							SNew(SButton)
+							.OnClicked_Raw(this, &FrebocapModule::OnOpenLogsFolderClicked)
+							.ContentPadding(FMargin(8.0f, 4.0f))
+							[
+								SNew(STextBlock)
+								.Text(LOCTEXT("OpenLogDirBtn", "打开日志目录"))
+							]
 						]
 					]
 				]
@@ -439,6 +552,86 @@ FText FrebocapModule::GetStatusText() const
 		return LOCTEXT("StatusConnected", "● 已连接 (Active)");
 	}
 	return LOCTEXT("StatusDisconnected", "○ 未连接 (Disconnected)");
+}
+
+FText FrebocapModule::GetMocapHzText() const
+{
+	auto Source = FRebocapSource::GetInstance();
+	if (Source.IsValid() && Source->IsPortOpen())
+	{
+		float Hz = Source->GetMocapHz();
+		return FText::FromString(FString::Printf(TEXT("%.1f Hz"), Hz));
+	}
+	return LOCTEXT("HzDisconnected", "0.0 Hz (未连接)");
+}
+
+FSlateColor FrebocapModule::GetMocapHzColor() const
+{
+	auto Source = FRebocapSource::GetInstance();
+	if (Source.IsValid() && Source->IsPortOpen())
+	{
+		float Hz = Source->GetMocapHz();
+		if (Hz >= 50.0f)
+		{
+			return FSlateColor(FLinearColor(0.1f, 0.95f, 0.2f)); // Green
+		}
+		else if (Hz > 0.0f)
+		{
+			return FSlateColor(FLinearColor(1.0f, 0.85f, 0.1f)); // Yellow
+		}
+		else
+		{
+			return FSlateColor(FLinearColor(1.0f, 0.5f, 0.1f)); // Orange
+		}
+	}
+	return FSlateColor(FLinearColor(0.6f, 0.6f, 0.6f)); // Gray
+}
+
+FText FrebocapModule::GetViewportFPSText() const
+{
+	float DeltaTime = FApp::GetDeltaTime();
+	float FPS = DeltaTime > 0.0f ? (1.0f / DeltaTime) : 0.0f;
+	return FText::FromString(FString::Printf(TEXT("%.1f FPS"), FPS));
+}
+
+FReply FrebocapModule::OnStartProfilerClicked()
+{
+	if (FRebocapProfiler::Get().IsRecording())
+	{
+		FRebocapProfiler::Get().StopRecordingAndGenerateReport();
+	}
+	else
+	{
+		FRebocapProfiler::Get().StartRecording(10.0f);
+	}
+	return FReply::Handled();
+}
+
+FReply FrebocapModule::OnOpenLogsFolderClicked()
+{
+	FString LogDir = FPaths::ProjectSavedDir() / TEXT("Logs");
+	IFileManager::Get().MakeDirectory(*LogDir, true);
+	FPlatformProcess::ExploreFolder(*LogDir);
+	return FReply::Handled();
+}
+
+FText FrebocapModule::GetProfilerButtonText() const
+{
+	if (FRebocapProfiler::Get().IsRecording())
+	{
+		return FText::FromString(FString::Printf(TEXT("■ 停止并生成报告 (剩余 %.1f 秒)"),
+			FRebocapProfiler::Get().GetRemainingTime()));
+	}
+	return LOCTEXT("StartProfilerBtn", "● 开始 10 秒性能与运行诊断日志采集");
+}
+
+FSlateColor FrebocapModule::GetProfilerButtonColor() const
+{
+	if (FRebocapProfiler::Get().IsRecording())
+	{
+		return FSlateColor(FLinearColor(0.85f, 0.15f, 0.15f));
+	}
+	return FSlateColor(FLinearColor(0.15f, 0.55f, 0.95f));
 }
 
 TOptional<uint16> FrebocapModule::GetPortValue() const

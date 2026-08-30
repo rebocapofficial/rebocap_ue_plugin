@@ -6,10 +6,12 @@
 #include "ILiveLinkClient.h" 
 #include "Async/Async.h"
 #include "Misc/QualifiedFrameTime.h"
+#include "rebocap_profiler.h"
 
 // 静态变量初始化
 TSharedPtr<FRebocapSource> FRebocapSource::instance_ = nullptr;
 bool FRebocapSource::bAutoSkeleton = true; 
+bool FRebocapSource::bZeroAllocStaticSubject = false; 
 
 FRebocapSource::FRebocapSource(uint16_t port) 
     : port_(port)
@@ -163,7 +165,11 @@ void FRebocapSource::Stop() {
 }
 
 void FRebocapSource::ManualStop() {
+    status_ = false;
     running_ = false;
+    if (rebocap_sdk_.IsValid()) {
+        rebocap_sdk_->Close();
+    }
 }
 
 void FRebocapSource::SetThreadPriority(EThreadPriority NewPriority) {
@@ -184,6 +190,17 @@ bool FRebocapSource::ManualStart(uint16_t port) {
         thread_ = FRunnableThread::Create(this, *ThreadName, 512 * 1024, thread_priority_);
     }
     return running_;
+}
+
+float FRebocapSource::GetMocapHz() const {
+    if (!status_) {
+        return 0.0f;
+    }
+    const double Now = FPlatformTime::Seconds();
+    if (last_fps_calc_time_ > 0.0 && (Now - last_fps_calc_time_ > 1.5) && (frames_in_period_ == 0)) {
+        return 0.0f;
+    }
+    return current_mocap_hz_.load();
 }
 
 int FRebocapSource::CalculateAndRegisterToRebocap(
@@ -207,10 +224,44 @@ void FRebocapSource::pose_msg_callback(const QuatMsg* msg) {
 
     if (!msg) return;
 
+    // 实时动捕流接收频率统计 (Hz)
+    const double CurrentTime = FPlatformTime::Seconds();
+    FRebocapProfiler::Get().RecordPacketArrival(CurrentTime);
+    frames_in_period_++;
+    const double ElapsedTime = CurrentTime - last_fps_calc_time_;
+    if (ElapsedTime >= 0.5) {
+        current_mocap_hz_.store(static_cast<float>(frames_in_period_ / ElapsedTime));
+        frames_in_period_ = 0;
+        last_fps_calc_time_ = CurrentTime;
+    }
+
     FName subject = "rebocap";
     
     // 1. 推送静态数据 (声明 60 FPS 采样率)
-    {
+    if (bZeroAllocStaticSubject) {
+        if (!subject_names_.Contains(subject)) {
+            FLiveLinkStaticDataStruct static_data_struct = FLiveLinkStaticDataStruct(FLiveLinkSkeletonStaticData::StaticStruct());
+            FLiveLinkSkeletonStaticData& static_data = *static_data_struct.Cast<FLiveLinkSkeletonStaticData>();
+
+            static const TArray<FName> bone_names = {
+                rebocap_bones::pelvis,  rebocap_bones::l_hip,      rebocap_bones::r_hip,      rebocap_bones::spine1,   rebocap_bones::l_knee,
+                rebocap_bones::r_knee,  rebocap_bones::spine2,     rebocap_bones::l_ankle,    rebocap_bones::r_ankle,  rebocap_bones::spine3,
+                rebocap_bones::l_foot,  rebocap_bones::r_foot,     rebocap_bones::neck,       rebocap_bones::l_collar, rebocap_bones::r_collar,
+                rebocap_bones::head,    rebocap_bones::l_shoulder, rebocap_bones::r_shoulder, rebocap_bones::l_elbow,  rebocap_bones::r_elbow,
+                rebocap_bones::l_wrist, rebocap_bones::r_wrist,    rebocap_bones::l_hand,     rebocap_bones::r_hand,
+            };
+
+            static const TArray<int32> bone_parents = {
+                -1, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9, 12, 13, 14, 16, 17, 18, 19, 20, 21,
+            };
+
+            static_data.SetBoneNames(bone_names);
+            static_data.SetBoneParents(bone_parents);
+
+            client_->PushSubjectStaticData_AnyThread({source_guid_, subject}, ULiveLinkAnimationRole::StaticClass(), MoveTemp(static_data_struct));
+            subject_names_.Add(subject);
+        }
+    } else {
         FLiveLinkStaticDataStruct static_data_struct = FLiveLinkStaticDataStruct(FLiveLinkSkeletonStaticData::StaticStruct());
         FLiveLinkSkeletonStaticData& static_data = *static_data_struct.Cast<FLiveLinkSkeletonStaticData>();
 
@@ -238,7 +289,6 @@ void FRebocapSource::pose_msg_callback(const QuatMsg* msg) {
     // 2. 推送帧数据
     FLiveLinkFrameDataStruct frame = FLiveLinkFrameDataStruct(FLiveLinkAnimationFrameData::StaticStruct());
     FLiveLinkBaseFrameData* base_data = frame.GetBaseData();
-    const double CurrentTime = FPlatformTime::Seconds();
     base_data->WorldTime = FLiveLinkWorldTime(CurrentTime);
     base_data->MetaData.SceneTime = FQualifiedFrameTime(FFrameTime(FFrameNumber((int32)(CurrentTime * 60.0))), FFrameRate(60, 1));
     

@@ -5,11 +5,11 @@
 #include "Animation/AnimInstanceProxy.h"
 #include "Animation/AnimNodeBase.h"
 #include "BoneControllers/AnimNode_SkeletalControlBase.h"
-#include "LiveLinkRemapAsset.h"
 #include "LiveLinkTypes.h"
 #include "ILiveLinkClient.h"
 #include "Runtime/Launch/Resources/Version.h"
 
+class ULiveLinkRemapAsset;
 class ILiveLinkClient;
 
 #if ENGINE_MAJOR_VERSION < 5
@@ -133,6 +133,37 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode : public FAnimNode_SkeletalControlBa
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (EditCondition = "bHoldPoseOnDropout", PinHiddenByDefault, DisplayName = "Dropout Timeout (s)", ClampMin = "0.1", ClampMax = "10.0", ToolTip = "Timeout in seconds before dropping out of pose hold protection. / 丢包防闪容错超时时间（秒）。"))
   float DropoutTimeout = 2.0f;
 
+  // 5. 视口实时诊断 HUD (默认关闭)
+  /** 
+   * 是否在游戏或编辑器视口左上角实时显示动捕流诊断信息（包含动捕接收频率 Hz、渲染 FPS 与连接状态）。（默认关闭）
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rebocap Settings", meta = (PinShownByDefault, DisplayName = "Show Viewport Debug HUD", ToolTip = "Displays real-time mocap input rate (Hz), viewport rendering FPS, and stream diagnostics on screen. / 视口左上角实时显示动捕接收频率与渲染帧率。（默认关闭）"))
+  bool bShowDebugHUD = false;
+
+  // --- 🔬 实验性底层性能优化 (默认全部关闭，保持原有逻辑) ---
+
+  /** 
+   * [实验性] 开启骨骼与顶点回传节流保护：
+   * 开启后将 T-Pose 与脚底顶点向上位机的回传限制为每 2.0 秒最多尝试 1 次，握手成功后彻底静默；
+   * 避免刚连接或未就绪时每帧重复执行网格遍历与网络发包。（默认关闭）
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Experimental / 实验性性能优化 (默认关闭)", meta = (PinHiddenByDefault, DisplayName = "Throttle Skeleton Registration", ToolTip = "[Experimental] Throttles skeleton and vertex registration to at most once per 2 seconds to eliminate per-frame CPU hitches. / 开启骨骼与顶点回传节流保护（默认关闭）。"))
+  bool bThrottleSkeletonRegistration = false;
+
+  /** 
+   * [实验性] 零开销 LiveLink 数据构建：
+   * 开启后在动捕接收线程中跳过每秒 60 次的临时静态结构体内存分配。（默认关闭）
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Experimental / 实验性性能优化 (默认关闭)", meta = (PinHiddenByDefault, DisplayName = "Zero-Alloc Static Subject", ToolTip = "[Experimental] Skips redundant 60Hz LiveLink static skeleton allocations when subject is already registered. / 零开销 LiveLink 数据构建（默认关闭）。"))
+  bool bZeroAllocStaticSubject = false;
+
+  /** 
+   * [实验性] 动画求值线程锁与缓存优化：
+   * 开启后缓存 LiveLink 角色角色类型（Subject Role），避免每帧高频求值时重复向 LiveLinkClient 申请角色安全锁。（默认关闭）
+   */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Experimental / 实验性性能优化 (默认关闭)", meta = (PinHiddenByDefault, DisplayName = "Optimize Frame Evaluation", ToolTip = "[Experimental] Caches LiveLink subject role to reduce per-frame lock contention on animation evaluation thread. / 动画求值线程锁与缓存优化（默认关闭）。"))
+  bool bOptimizeFrameEvaluation = false;
+
   // -----------------------------
 
   UPROPERTY(transient)
@@ -200,6 +231,8 @@ struct REBOCAP_RUNTIME_API FRebocapPoseNode : public FAnimNode_SkeletalControlBa
   double last_valid_frame_time_ = 0.0;
   bool bHasValidFrameCached_ = false;
   bool bHasInterpolatedPoseCached_ = false;
+  double last_skeleton_submit_time_ = 0.0;
+  TSubclassOf<ULiveLinkRole> cached_subject_role_ = nullptr;
 
   TArray<FVector3f> LeftVertices_, LeftNormals_, RightVertices_, RightNormals_, SkeletonPosition_;
 };

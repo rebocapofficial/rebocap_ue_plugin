@@ -2,17 +2,41 @@
 #include "SceneManagement.h"
 #include "rebocap_body_remap_asset.h"
 #include "rebocap_skeleton_data.h"
+#include "rebocap_source.h"
 
 #define LOCTEXT_NAMESPACE "RebocapAnimGraphNode"
 
 FText UAnimGraphNode_RebocapPose::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
+    if (TitleType == ENodeTitleType::ListView)
+    {
+        return LOCTEXT("RebocapPoseNodeTitle", "Rebocap Body Pose");
+    }
+
+    auto Source = FRebocapSource::GetInstance();
+    if (Source.IsValid() && Source->IsPortOpen())
+    {
+        float Hz = Source->GetMocapHz();
+        if (Hz > 0.0f)
+        {
+            return FText::FromString(FString::Printf(TEXT("Rebocap Body Pose [%.1f Hz]"), Hz));
+        }
+        return LOCTEXT("RebocapPoseNodeTitleActive", "Rebocap Body Pose [已连接]");
+    }
     return LOCTEXT("RebocapPoseNodeTitle", "Rebocap Body Pose");
 }
 
 FText UAnimGraphNode_RebocapPose::GetTooltipText() const
 {
-    return LOCTEXT("RebocapPoseNodeTooltip", "Drives skeletal mesh with real-time Rebocap LiveLink motion capture data via bone retarget mapping.");
+    auto Source = FRebocapSource::GetInstance();
+    if (Source.IsValid() && Source->IsPortOpen())
+    {
+        return FText::FromString(FString::Printf(TEXT("Rebocap 动捕驱动节点\n● 当前状态: 已连接 (Active)\n● 动捕接收频率: %.1f Hz\n● 骨骼自动回传: %s\n● 帧平滑插值: %s"),
+            Source->GetMocapHz(),
+            Node.bAutoSkeleton ? TEXT("开启") : TEXT("关闭"),
+            Node.bEnableInterpolation ? TEXT("开启") : TEXT("关闭")));
+    }
+    return LOCTEXT("RebocapPoseNodeTooltip", "Rebocap 动捕驱动节点\n○ 当前状态: 未连接 (Disconnected)\n通过骨骼重定向映射表驱动角色的 LiveLink 动作捕捉数据。");
 }
 
 FText UAnimGraphNode_RebocapPose::GetMenuCategory() const

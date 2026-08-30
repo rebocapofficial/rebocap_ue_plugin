@@ -1,6 +1,12 @@
 #pragma once
 
+#include "Runtime/Launch/Resources/Version.h"
+#if ENGINE_MAJOR_VERSION >= 5
 #include "Editor/AnimGraph/Public/AnimGraphNode_SkeletalControlBase.h"
+#else
+#include "AnimGraphNode_SkeletalControlBase.h"
+#endif
+
 #include "rebocap_pose_node.h"
 // clang-format off
 #include "rebocap_pose.generated.h"
